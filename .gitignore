@@ -9,3 +9,9 @@ buildNumber.properties
 .mvn/timing.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
+
+# Eclipse configs, possibly ignored in error
+.classpath
+.project
+.settings/*
+# If build fails, try re-adding them to repository.
