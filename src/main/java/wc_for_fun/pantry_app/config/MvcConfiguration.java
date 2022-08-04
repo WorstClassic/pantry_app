@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
-@ComponentScan(basePackages={"wc_for_fun.pantry_app","domains","mockData"})
+@ComponentScan(basePackages="wc_for_fun.pantry_app")
 @EnableWebMvc
 public class MvcConfiguration implements WebMvcConfigurer{
 

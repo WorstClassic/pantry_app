@@ -1,15 +1,15 @@
-package mockData;
+package wc_for_fun.pantry_app.mockData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-import domains.containers.Container;
-import domains.items.Item;
-import domains.items.UPCWrapper;
+import wc_for_fun.pantry_app.domains.containers.Container;
+import wc_for_fun.pantry_app.domains.items.Item;
+import wc_for_fun.pantry_app.domains.items.UPCWrapper;
 
 /**
  * Mocks up data using a static list.
@@ -17,7 +17,7 @@ import domains.items.UPCWrapper;
  * @author Classic
  *
  */
-@Service
+@Component
 public class MockData {
 	private static ArrayList<Item> Items;
 	private static ArrayList<Container> Containers;
@@ -26,19 +26,19 @@ public class MockData {
 		whyDidDataloaderFailMe();
 	}
 
-	public static ArrayList<Item> getItems() {
+	public List<Item> getItems() {
 		return Items;
 	}
 
-	public static void setItems(ArrayList<Item> items) {
+	public void setItems(ArrayList<Item> items) {
 		Items = items;
 	}
 
-	public static ArrayList<Container> getContainers() {
+	public List<Container> getContainers() {
 		return Containers;
 	}
 
-	public static void setContainers(ArrayList<Container> containers) {
+	public void setContainers(ArrayList<Container> containers) {
 		Containers = containers;
 	}
 
@@ -138,5 +138,20 @@ public class MockData {
 		bakingPowder.setNaiiveUnit("Oz");
 		bakingPowder.setNaiiveUnitValue("8.1");
 		itemsList.add(bakingPowder);
+		
+		int greatersize = itemsList.size();
+		int lessersize = containersList.size();
+		// Don't forget that you're assuming itemslist is going to always be larger.
+		for(int i=0 ; i< lessersize; i++) {
+			Long index = Long.valueOf(i); // We're not even pretending to be an SQL DB, so why bother with a valid ID?
+			containersList.get(i).setId(index);
+			itemsList.get(i).setId(index);
+		}
+		for(int i=lessersize; i<greatersize;i++) {
+			itemsList.get(i).setId(Long.valueOf(i));
+		}
+		
+		Containers = containersList;
+		Items = itemsList;
 	}
 }

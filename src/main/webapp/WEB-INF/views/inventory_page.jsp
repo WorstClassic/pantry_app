@@ -9,8 +9,7 @@
     </head>
     <body>
     <div id="homepage-navbar" class="navbar">Login</div>
-        <h3 class="center">Welcome to Pantry Helper</h3>
+        <h3 class="center">Welcome to your inventory</h3>
         <span class="locations banner"><a href="/inventory">Full Inventory</a><a href="/containers">Containers</a></span>
-        <div>Would you like to log in?</div>
     </body>
 </html>
