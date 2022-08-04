@@ -10,9 +10,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
-@Configuration
+//@Configuration
 @ComponentScan(basePackages={"wc_for_fun.pantry_app","domains","mockData"})
-@EnableWebMvc
+//@EnableWebMvc
 public class MvcConfiguration implements WebMvcConfigurer{
 
 	@Bean
@@ -27,6 +27,4 @@ public class MvcConfiguration implements WebMvcConfigurer{
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
 	}
-
-	
 }
