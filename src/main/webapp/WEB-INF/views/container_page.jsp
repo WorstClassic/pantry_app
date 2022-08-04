@@ -10,6 +10,6 @@
     <body>
     <div id="homepage-navbar" class="navbar">Login</div>
         <h3 class="center">Welcome to your containers.</h3>
-        <span class="locations banner"><a href="/inventory">Full Inventory</a><a href="/containers">Containers</a></span>
+        <span class="locations banner"><a href="./inventory">Full Inventory</a><a href="./containers">Refresh this Page</a></span>
     </body>
 </html>

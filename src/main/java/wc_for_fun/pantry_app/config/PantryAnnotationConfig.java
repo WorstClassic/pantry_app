@@ -1,5 +1,7 @@
 package wc_for_fun.pantry_app.config;
 
+import javax.servlet.Filter;
+
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class PantryAnnotationConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
@@ -19,4 +21,9 @@ public class PantryAnnotationConfig extends AbstractAnnotationConfigDispatcherSe
 		return new String[] { "/" };
 	}
 
+	@Override
+	protected Filter[] getServletFilters() {
+		Filter[] singleton = {};
+		return singleton;
+	}
 }
