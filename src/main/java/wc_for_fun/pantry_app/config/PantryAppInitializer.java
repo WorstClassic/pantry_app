@@ -18,7 +18,7 @@ public class PantryAppInitializer implements WebApplicationInitializer {
 		webContext.register(MvcConfiguration.class);
 		webContext.setServletContext(servletContext);
 
-		ServletRegistration.Dynamic servlet = servletContext.addServlet("dispatchr", new DispatcherServlet(webContext));
+		ServletRegistration.Dynamic servlet = servletContext.addServlet("dispatcher2", new DispatcherServlet(webContext));
 
 		servlet.setLoadOnStartup(1);
 		servlet.addMapping("/");
