@@ -1,11 +1,11 @@
 /**
  * 
  */
-package domains.containers;
+package wc_for_fun.pantry_app.domains.containers;
 
 import java.util.List;
 
-import domains.items.Item;
+import wc_for_fun.pantry_app.domains.items.Item;
 
 /**
  * @author Classic

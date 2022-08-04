@@ -9,8 +9,8 @@
 </head>
 <body>
 	<div id="homepage-navbar" class="navbar">
-		<span class="locations banner"><a href="/inventory">Full
-				Inventory</a><a href="/containers">Containers</a></span>
+		<span class="locations banner"><a href="./inventory">Full
+				Inventory</a><a href="./containers">Containers</a></span>
 	</div>
 	<h3 class="center">Welcome to Pantry Helper</h3>
 </body>

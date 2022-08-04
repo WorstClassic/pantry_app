@@ -1,11 +1,11 @@
 /**
  * 
  */
-package domains.items;
+package wc_for_fun.pantry_app.domains.items;
 
 import java.util.List;
 
-import domains.containers.Container;
+import wc_for_fun.pantry_app.domains.containers.Container;
 
 /**
  * @author Classic
@@ -16,6 +16,6 @@ public interface ItemService {
 	public Item getSolo(Long itemId);
 	public Item addItemToContainer(Item incomingItem, Container incomingContainer);
 	public boolean hasItemByUPC(String incomingUPC);
-	public Item getItemByUPC(String incomingUPC);
+	public ItemAndSourceDTO getItemByUPC(String incomingUPC);
 	public List<Item> getItemsByUPC(String incomingUPC);
 }
