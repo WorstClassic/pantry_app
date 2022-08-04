@@ -1,13 +1,10 @@
-package wc_for_fun.pantry_app.domains.items;
+package domains.items;
 
 import javax.persistence.*;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-import wc_for_fun.pantry_app.domains.containers.Container;
+import domains.containers.Container;
 
 import java.time.*;
 import java.util.List;
@@ -18,20 +15,11 @@ public class Item {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Long id;
-	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long newId) {
-		id=newId;
-	}
+	private int id;
 	
 	private UPCWrapper upc;
 
-	@DateTimeFormat(pattern="dd.MM.yyyy")
 	private LocalDate obtainDate;
-	@DateTimeFormat(pattern="dd.MM.yyyy")
 	private LocalDate expiryDate;
 	
 	@JsonIgnoreProperties(value="contents")
@@ -41,9 +29,7 @@ public class Item {
 	private String naiiveItemDescription;
 	
 	//javax.measure's unit api should replace these in business logic at very least.
-	@JsonProperty("unit")
 	private String naiiveUnit;
-	@JsonProperty("unit_amount")
 	private String naiiveUnitValue;
 	public UPCWrapper getUpc() {
 		return upc;

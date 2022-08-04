@@ -1,23 +1,22 @@
-package wc_for_fun.pantry_app.domains.containers;
+package domains.containers;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import wc_for_fun.pantry_app.domains.items.Item;
-import wc_for_fun.pantry_app.mockData.MockData;
+import domains.items.Item;
+import mockData.MockData;
 
 @Service
 public class ContainerServiceImpl implements ContainerService {
 	
 	@Autowired
-	MockData mockdata;
+	MockData mockData;
 
 	@Override
 	public Container addContainer(Container incomingContainer) {
-		incomingContainer.setId(Long.valueOf(mockdata.getContainers().size()));
-		mockdata.getContainers().add(incomingContainer);
+		mockData.getContainers().add(incomingContainer);
 		return incomingContainer;
 	}
 
@@ -33,7 +32,7 @@ public class ContainerServiceImpl implements ContainerService {
 	@Override
 	public Container getSolo(Long containerId) {
 		try {
-			return mockdata.getContainers().get(containerId.intValue());
+			return mockData.getContainers().get(containerId.intValue());
 		} catch (IndexOutOfBoundsException e) {
 			System.out.println("Out of bounds Id.");
 		}
@@ -42,7 +41,7 @@ public class ContainerServiceImpl implements ContainerService {
 
 	@Override
 	public List<Container> getAll() {
-		return mockdata.getContainers();
+		return mockData.getContainers();
 	}
 
 	@Override
@@ -51,7 +50,7 @@ public class ContainerServiceImpl implements ContainerService {
 	 * 
 	 */
 	public boolean containerExistsByName(Container queryContainer) {
-		for (Container element : mockdata.getContainers()) {
+		for (Container element : mockData.getContainers()) {
 			if (queryContainer.getName().equalsIgnoreCase(element.getName()))
 				return true;
 		}
@@ -59,7 +58,7 @@ public class ContainerServiceImpl implements ContainerService {
 	}
 
 	public boolean containerExistsByName(String queryString) {
-		for (Container element : mockdata.getContainers()) {
+		for (Container element : mockData.getContainers()) {
 			if (queryString.equalsIgnoreCase(element.getName()))
 				return true;
 		}
@@ -68,7 +67,7 @@ public class ContainerServiceImpl implements ContainerService {
 
 	@Override
 	public Container getContainerByName(String queryString) {
-		for (Container element : mockdata.getContainers()) {
+		for (Container element : mockData.getContainers()) {
 			if (queryString.equalsIgnoreCase(element.getName()))
 				return element;
 		}

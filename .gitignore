@@ -15,6 +15,3 @@ buildNumber.properties
 .project
 .settings/*
 # If build fails, try re-adding them to repository.
-
-# intelliJ .idea used to try and force maven update.
-.idea/*

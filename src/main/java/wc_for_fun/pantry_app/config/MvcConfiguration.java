@@ -11,7 +11,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
 @Configuration
-@ComponentScan(basePackages="wc_for_fun.pantry_app")
+@ComponentScan(basePackages={"wc_for_fun.pantry_app","domains","mockData"})
 @EnableWebMvc
 public class MvcConfiguration implements WebMvcConfigurer{
 

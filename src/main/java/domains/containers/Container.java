@@ -1,4 +1,4 @@
-package wc_for_fun.pantry_app.domains.containers;
+package domains.containers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,21 +7,14 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import wc_for_fun.pantry_app.domains.items.Item;
+import domains.items.Item;
 
 
 @Entity
 public class Container {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Long id;
-	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long newId) {
-		id=newId;
-	}
+	private int id;
 	
 	private List<Item> contents = new ArrayList<Item>();
 
