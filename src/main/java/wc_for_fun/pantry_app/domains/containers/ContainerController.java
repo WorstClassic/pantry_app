@@ -49,7 +49,8 @@ public class ContainerController {
 		Container existingContainer = containerService.getSolo(id);
 		if (existingContainer == null)
 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-		Item tentativeReturn = itemService.addItemToContainer(newItem, existingContainer);
+		Item tentativeReturn = itemService.addItemToValidContainer(newItem, existingContainer);
+		tentativeReturn = containerService.addItemToContainer(tentativeReturn, existingContainer);
 		if (tentativeReturn == null)
 			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		return new ResponseEntity<>(tentativeReturn, HttpStatus.CREATED);

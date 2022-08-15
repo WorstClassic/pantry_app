@@ -10,7 +10,7 @@ import wc_for_fun.pantry_app.mockData.MockData;
 
 @Service
 public class ContainerServiceImpl implements ContainerService {
-	
+
 	@Autowired
 	MockData mockdata;
 
@@ -21,12 +21,19 @@ public class ContainerServiceImpl implements ContainerService {
 		return incomingContainer;
 	}
 
+	/**
+	 * In this implementation, the service is confirming that the incoming container
+	 * exists on the item's containers list, and updating the existing
+	 * back-reference on itself.
+	 */
 	@Override
 	public Item addItemToContainer(Item incomingItem, Container incomingContainer) {
 		if (incomingContainer.addAnItem(incomingItem))
-			if (incomingItem.getContainers().contains(incomingContainer))
-				if (incomingItem.getContainers().add(incomingContainer))
-					return incomingItem;
+			if (incomingItem.getContainers().contains(incomingContainer)) {
+				return incomingItem;
+			} else {
+				System.out.println("We didn't correctly back-reference the container and I don't want to create responsibility confusion.");
+			}
 		return null;
 	}
 

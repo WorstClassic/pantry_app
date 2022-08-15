@@ -9,25 +9,25 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import wc_for_fun.pantry_app.domains.items.Item;
 
-
 @Entity
 public class Container {
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long newId) {
-		id=newId;
+		id = newId;
 	}
-	
-	private List<Item> contents = new ArrayList<Item>();
+
+	private List<Item> contents;// = new ArrayList<Item>();
 
 	private String name;
 
-	@JsonIgnoreProperties(value="containers")
+	@JsonIgnoreProperties(value = "containers")
 	public List<Item> getContents() {
 		return contents;
 	}
@@ -43,14 +43,18 @@ public class Container {
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	/**
-	 * Adds an item to the container; mutating it.
-	 * Currently does not check for duplicates.
-	 * Currently does not confirm or update that the item has a back-reference.
-	 * @param addMe an item to add to the container. 
+	 * Adds an item to the container; mutating it. Currently does not check for
+	 * duplicates. Currently does not confirm or update that the item has a
+	 * back-reference.
+	 * 
+	 * @param addMe an item to add to the container.
 	 * @return forwards result of add operation.
 	 */
 	public boolean addAnItem(Item addMe) {
+		if (contents == null)
+			contents = new ArrayList<Item>();
 		return contents.add(addMe);
 	}
 }

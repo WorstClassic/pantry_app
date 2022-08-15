@@ -1,24 +1,21 @@
 package wc_for_fun.pantry_app.domains.items;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import okhttp3.Call;
 import okhttp3.HttpUrl;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 import wc_for_fun.pantry_app.constants.SourceConstantsInventory;
 import wc_for_fun.pantry_app.constants.URIConstantsInventory;
 import wc_for_fun.pantry_app.domains.containers.Container;
@@ -35,19 +32,22 @@ public class ItemServiceImpl implements ItemService {
 	MockData mockdata;
 
 	@Override
-	public Item addItemToContainer(Item incomingItem, Container incomingContainer) {
+	public Item addItemToValidContainer(Item incomingItem, Container incomingContainer) {
 		if (incomingItem != null) {
-			Container containerReference = null;
-			if (incomingContainer != null) {
-				String queryString = incomingContainer.getName();
-				if (queryString == null || queryString.isEmpty()
-						|| !containerService.containerExistsByName(queryString)) {
-					// TODO with real logging.
-					System.out.println("Container unposted");
-					return null; // break due to un-posted container.
-				}
-				containerReference = containerService.getContainerByName(queryString);
-			}
+//			Container containerReference = null;
+//			if (incomingContainer != null) {
+//				String queryString = incomingContainer.getName();
+//				if (queryString == null || queryString.isEmpty()
+//						|| !containerService.containerExistsByName(queryString)) {
+//					// TODO with real logging.
+//					System.out.println("Container unposted");
+//					return null; // break due to un-posted container.
+//				}
+//				containerReference = containerService.getContainerByName(queryString);
+//			}
+			incomingItem = inferDefaults(incomingItem);
+			// assignment not necessary since inferDefaults is naughty and mutates an object
+			// rather than newing up a fresh one.
 			UPCWrapper incomingUPC = incomingItem.getUpc();
 			if (incomingUPC == null)
 				return null; // break due to invalid incoming item.
@@ -56,8 +56,9 @@ public class ItemServiceImpl implements ItemService {
 				List<Item> listOfExistingItems = getItemsByUPC(incomingUPCString);
 				List<Container> clonedList = new ArrayList<>();
 				clonedList.addAll(listOfExistingItems.get(0).getContainers());
+				incomingItem.setContainers(clonedList);
 				listOfExistingItems.add(incomingItem);
-				if (updateContainingInventories(listOfExistingItems, containerReference)) {
+				if (updateContainingInventories(listOfExistingItems, incomingContainer)) {
 					// TODO log success?
 					System.out.println("Successful add of item to inventory.");
 				}
@@ -65,19 +66,61 @@ public class ItemServiceImpl implements ItemService {
 				ArrayList<Container> cleanContainerInventory = new ArrayList<>();
 				cleanContainerInventory.add(incomingContainer);
 				incomingItem.setContainers(cleanContainerInventory);
+				containerService.addItemToContainer(incomingItem, incomingContainer);
 			}
-			containerService.addItemToContainer(incomingItem, incomingContainer);
+			incomingItem.setId(Long.valueOf(mockdata.getItems().size()));
 			mockdata.getItems().add(incomingItem);
 			return incomingItem;
 		}
 		return null;
 	}
 
+	/**
+	 * We're operating under the assumption that a map is going to be more expensive
+	 * than traversing the list.
+	 * 
+	 * @param itemsToUpdate
+	 * @param addMeToTheLists
+	 * @return
+	 */
 	private boolean updateContainingInventories(List<Item> itemsToUpdate, Container addMeToTheLists) {
+//				List<Container> canIBeUpdated = new ArrayList<>();
+//		String containerName = addMeToTheLists.getName();
+//		for (Item item : itemsToUpdate) {
+//			int lastIndex = item.getContainers().size()-1;
+//			if(lastIndex < 0) continue; //don't index oob.
+//			if (!item.getContainers().get(lastIndex).getName().equalsIgnoreCase(containerName)) {
+//				canIBeUpdated.add(addMeToTheLists);
+//				item.getContainers().add(addMeToTheLists);
+//			}
+//		}
+//		return true;
 		for (Item item : itemsToUpdate) {
-			int lastIndex = item.getContainers().size();
-			if (!item.getContainers().get(lastIndex).getName().equalsIgnoreCase(addMeToTheLists.getName()))
-				item.getContainers().add(addMeToTheLists);
+			boolean doAdd = true;
+			List<Container> containersHoldingItem = item.getContainers();
+			if (containersHoldingItem == null) {
+				containersHoldingItem = new ArrayList<>();
+			}
+			if (containersHoldingItem.size() == 0) {
+				System.out.println("maybe I want to do stuff here?");
+			} else {
+				String addMeName = addMeToTheLists.getName();
+				for (Container container : item.getContainers()) {
+					if (addMeName.equalsIgnoreCase(container.getName())) {
+						doAdd = false;
+						break;
+					}
+				}
+			}
+			if (doAdd) {
+				try {
+					containersHoldingItem.add(addMeToTheLists);
+				} catch (UnsupportedOperationException e) {
+					containersHoldingItem = new ArrayList<Container>(containersHoldingItem);
+					containersHoldingItem.add(addMeToTheLists);
+				}
+				item.setContainers(containersHoldingItem);
+			}
 		}
 		return true;
 	}
@@ -110,7 +153,8 @@ public class ItemServiceImpl implements ItemService {
 		if (tentativeItem != null) {
 			ItemAndSourceDTO readyToReturn = new ItemAndSourceDTO();
 			readyToReturn.setItem(tentativeItem);
-			readyToReturn.setSource(SourceConstantsInventory.CACHE);
+			readyToReturn.setSource(SourceConstantsInventory.DEFAULT_UPC_LOOKUP); // TODO return this to .CACHE after
+																					// done testing,
 			return readyToReturn;
 		}
 		HttpUrl.Builder urlBuilder = HttpUrl.parse(URIConstantsInventory.DEFAULT_UPC_LOOKUP_URL).newBuilder();
@@ -144,7 +188,7 @@ public class ItemServiceImpl implements ItemService {
 	@Override
 	public boolean hasItemByUPC(String incomingUPC) {
 		for (Item item : mockdata.getItems())
-			if (item.getUpc().toString().equalsIgnoreCase(incomingUPC))
+			if (item.getUpc().equals(incomingUPC))
 				return true;
 		return false;
 	}
@@ -164,18 +208,25 @@ public class ItemServiceImpl implements ItemService {
 	private Item convertResponseToItem(Response incomingResponse) {
 		ObjectMapper autowireThisMapper = new ObjectMapper();
 		try {
-		JsonNode responseRoot = autowireThisMapper.readTree(incomingResponse.body().byteStream());
-		JsonNode itemNode = responseRoot.findValues("items").get(0);
-		Item takingJsonValues = new Item();
-		takingJsonValues.setUpc(new UPCWrapper(itemNode.findValue("upc").asText()));
-		takingJsonValues.setNaiiveItemName(itemNode.findValue("title").asText());
-		takingJsonValues.setNaiiveItemDescription(itemNode.findValue("description").asText());
-		return takingJsonValues;
-		}
-		catch(IOException e) {
+			JsonNode responseRoot = autowireThisMapper.readTree(incomingResponse.body().byteStream());
+			JsonNode itemNode = responseRoot.findValues("items").get(0);
+			Item takingJsonValues = new Item();
+			takingJsonValues.setUpc(new UPCWrapper(itemNode.findValue("upc").asText()));
+			takingJsonValues.setNaiiveItemName(itemNode.findValue("title").asText());
+			takingJsonValues.setNaiiveItemDescription(itemNode.findValue("description").asText());
+			return takingJsonValues;
+		} catch (IOException e) {
 			System.out.println("Log jackson fail?");
 			return null;
 		}
+	}
+
+	private Item inferDefaults(Item incomingItem) {
+		if (incomingItem.getObtainDate() == null)
+			incomingItem.setObtainDate(LocalDate.now());
+		if (incomingItem.getExpiryDate() == null)
+			incomingItem.setExpiryDate(incomingItem.getObtainDate().plusDays(5));
+		return incomingItem;
 	}
 
 }

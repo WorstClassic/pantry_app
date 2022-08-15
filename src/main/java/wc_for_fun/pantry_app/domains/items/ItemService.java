@@ -14,7 +14,7 @@ import wc_for_fun.pantry_app.domains.containers.Container;
 public interface ItemService {
 	public List<Item> getAll();
 	public Item getSolo(Long itemId);
-	public Item addItemToContainer(Item incomingItem, Container incomingContainer);
+	public Item addItemToValidContainer(Item incomingItem, Container incomingContainer);
 	public boolean hasItemByUPC(String incomingUPC);
 	public ItemAndSourceDTO getItemByUPC(String incomingUPC);
 	public List<Item> getItemsByUPC(String incomingUPC);

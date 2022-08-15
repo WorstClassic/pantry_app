@@ -3,13 +3,15 @@
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Home</title>
-    </head>
-    <body>
-    <div id="homepage-navbar" class="navbar">Login</div>
-        <h3 class="center">Welcome to your inventory</h3>
-        <span class="locations banner"><a href="/inventory">Full Inventory</a><a href="/containers">Containers</a></span>
-    </body>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Inventory</title>
+</head>
+<body>
+	<div id="homepage-navbar" class="navbar">
+		<h3 class="center">Welcome to your inventory</h3>
+		<span class="locations banner"><a href="./inventory">Full
+				Inventory</a><a href="./containers">Containers</a></span>
+	</div>
+</body>
 </html>

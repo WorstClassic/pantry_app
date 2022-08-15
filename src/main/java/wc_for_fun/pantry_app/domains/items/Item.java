@@ -2,6 +2,11 @@ package wc_for_fun.pantry_app.domains.items;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import javafx.util.converter.LocalDateStringConverter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -29,9 +34,13 @@ public class Item {
 	
 	private UPCWrapper upc;
 
-	@DateTimeFormat(pattern="dd.MM.yyyy")
+	// @DateTimeFormat(pattern="dd.MM.yyyy")
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonSerialize(using = LocalDateSerializer.class)
 	private LocalDate obtainDate;
-	@DateTimeFormat(pattern="dd.MM.yyyy")
+	// @DateTimeFormat(pattern="dd.MM.yyyy")
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonSerialize(using = LocalDateSerializer.class)
 	private LocalDate expiryDate;
 	
 	@JsonIgnoreProperties(value="contents")
