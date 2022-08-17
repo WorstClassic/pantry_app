@@ -23,13 +23,14 @@
 	</div>
 	<div ng-controller="AddItemController as addItem">
 		<form id="add-item-form"
-		"addItem.submitItem($event)" 
+		ng-submit="addItem.submitItem($event)" 
 		ng-hide="addItem.successMessage || addItem.errorMessage">
 			<div id="upc-div">
 				<input id="upc-input-input" class="input large"
 					ng-model="addItem.upc" ng-disabled="addItem.upcIsRequested"
 					type="text" placeHolder="First- enter the item's UPC here" required></input>
-				<button type="submit" name="getUpc"
+				<button name="getUpc"
+				type="button"
 					ng-disable="addItem.upcIsRequested"
 					ng-click="addItem.upcQuery($event)">Find that item!</button>
 				<span ng-show="addItem.upcLookupError">{{addItem.upcLookupError}}</span>
@@ -58,6 +59,7 @@
 					<div ng-show="addItem.showRemoteInfo">
 						<div class="Center 10">
 							<button ng-if="displayEntry.copy===undefined"
+							type="button"
 								ng-click="addItem.transferFromLoad(displayEntry.name)"><-</button>
 						</div>
 						<div class="Right 40" ng-if="displayEntry.copy===undefined">{{addItem.upcQueryResponse.item[displayEntry.name]}}</div>
@@ -65,7 +67,7 @@
 				</div>
 				<div ng-show="addItem.showRemoteInfo">
 					This data came from {{addItem.upcQueryResponse.source}}.
-					<button ng-click="addItem.transferAll()">I want to use all
+					<button type="button" ng-click="addItem.transferAll()">I want to use all
 						the sourced data.</button>
 				</div>
 				<div ng-show="addItem.upcIsRequested">

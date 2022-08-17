@@ -32,10 +32,10 @@
 				<form action="/pantry_app/containers" method="POST">
 					<input ng-model="ctrl.newContainer.name" name="newContainer"
 						placeholder="What will it be named?" type="text" required></input>
-						<input type="submit" id="new-container-submit" value="Submit"></input>
+					<input type="submit" id="new-container-submit" value="Submit"></input>
 				</form>
 			</div>
-						<div>${error}</div>
+			<div>${error}</div>
 		</div>
 		<div ng-repeat="container in ctrl.containers"
 			class="container box display ng-hook" id="container-display">
@@ -43,7 +43,7 @@
 			<a ng-href="./containers/{{container.id}}/new-item"> Add an Item
 				to This Container </a>
 			<div ng-attr-id="{{'container-id-'+ container.id}}"
-				class="container entry">
+				class="container card entry">
 				<div ng-repeat="item in container.contents">
 					<div>upc: {{item.upc}}</div>
 					<div>name: {{item.naiiveItemName}} - {{item.unit_amount}}
@@ -58,7 +58,6 @@
 						Description:
 						<div>{{item.naiiveItemDescription}}</div>
 					</div>
-					</span>
 				</div>
 			</div>
 		</div>

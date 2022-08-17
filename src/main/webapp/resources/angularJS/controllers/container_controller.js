@@ -32,6 +32,7 @@ function ContainerController($scope, ContainerService) {
 			},
 			function exploreErr(err){
 				console.log(err);
+				console.log(err.message);
 			});
 	}
 

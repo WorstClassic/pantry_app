@@ -12,7 +12,9 @@ function InventoryServiceFactory($http) {
 	const factory = {
 		getAllItems: getAllItems,
 		getItemById: getItemById,
-		getItemByUpc:getItemByUpc
+		getItemByUpc:getItemByUpc,
+		
+		generateDateObject: generateDateObject
 	};
 
 	return factory;
@@ -27,6 +29,15 @@ function InventoryServiceFactory($http) {
 	
 		function getItemByUpc(upc) {
 		return $http.get(`${API_ROOT}${ITEM}${UPC}\\${upc}`);
+	}
+	
+	function generateDateObject(dateJSONArray){
+		if(dateJSONArray){
+			if(typeof dateJSONArray === "object" && Array.isArray(dateJSONArray)){
+				if(dateJSONArray.length===3)
+				return new Date(...dateJSONArray);
+			}			
+		}
 	}
 
 }

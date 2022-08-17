@@ -153,8 +153,7 @@ public class ItemServiceImpl implements ItemService {
 		if (tentativeItem != null) {
 			ItemAndSourceDTO readyToReturn = new ItemAndSourceDTO();
 			readyToReturn.setItem(tentativeItem);
-			readyToReturn.setSource(SourceConstantsInventory.DEFAULT_UPC_LOOKUP); // TODO return this to .CACHE after
-																					// done testing,
+			readyToReturn.setSource(SourceConstantsInventory.CACHE);
 			return readyToReturn;
 		}
 		HttpUrl.Builder urlBuilder = HttpUrl.parse(URIConstantsInventory.DEFAULT_UPC_LOOKUP_URL).newBuilder();

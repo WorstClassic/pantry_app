@@ -94,7 +94,7 @@ function AddItemController($scope, $location, ContainerService, InventoryService
 		//researching- it may be that certain browsers require an even more bonkers solution.
 		//newString=(' ' + oldString).slice(1);
 		//Might be required in Chrome.
-	}
+	}	
 
 	function transferAll() {
 		vm.displayOrderer.forEach(entry => {
@@ -128,16 +128,13 @@ function AddItemController($scope, $location, ContainerService, InventoryService
 
 	function postSuccess(res) {
 		const data = res.data;
-		const expiryParams = res.data.expiryDate;
-		if(expiryParams[1]>0) expiryParams[1]--;
-		 if(expiryParams[2]>0) expiryParams[2]--; //there is disagreement with regard to 
-		const expiryDateObj = new Date(...expiryParams);
+		const expiryDateObj = InventoryService.generateDateObject(data.expiryDate);
 		const expiryString = expiryDateObj.toDateString();
 		vm.successMessage = `Your ${data.naiiveItemName} has been added!  <br>   Remember that it will expire on: ${expiryString}.`;
 	}
 
 	function postFailMitigate(err) {
-
+	vm.errorMessage = err.message;
 	}
 	function postCleanup() { }
 
