@@ -51,7 +51,7 @@ function InventoryController($scope, InventoryService) {
 		vm.dataArrays.defaultLoad = [...rawReturn];
 		vm.dataArrays.sortByExpiry = [...rawReturn];
 		vm.dataArrays.sortByExpiry.sort((a, b) => {
-			return a.expiryDateObj - b.expiryDateObj;
+			return b.expiryDateObj - a.expiryDateObj;
 		});
 		vm.displayData = vm.dataArrays.defaultLoad;
 	}
