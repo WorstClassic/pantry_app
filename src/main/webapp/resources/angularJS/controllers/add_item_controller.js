@@ -18,6 +18,7 @@ function AddItemController($scope, $location, ContainerService, InventoryService
 	vm.postIsSent = false;
 	vm.containerId = findPathId();
 	vm.upcLookupError = false;
+	vm.upcQueryResolved = false;
 	vm.upcQuery = lookUpUpc;
 	vm.transferFromLoad = transferToWorkingItem;
 	vm.transferAll = transferAll;
@@ -94,7 +95,7 @@ function AddItemController($scope, $location, ContainerService, InventoryService
 		//researching- it may be that certain browsers require an even more bonkers solution.
 		//newString=(' ' + oldString).slice(1);
 		//Might be required in Chrome.
-	}	
+	}
 
 	function transferAll() {
 		vm.displayOrderer.forEach(entry => {
@@ -103,12 +104,8 @@ function AddItemController($scope, $location, ContainerService, InventoryService
 		});
 	}
 
-	function getUpcSuccess(res) {
-		vm.upcIsRequested = false;
-		vm.successMessage = `Your item has been added to ${res}`;
-	}
-
 	function upcCallComplete() {
+		vm.upcQueryResolved = true;
 		vm.showRemoteInfo = (vm.upcQueryResponse.source != "LOCAL_CACHE");
 		if (!vm.showRemoteInfo) { //TODO Lotta ! that could be omitted by renaming the boolean.
 			vm.displayOrderer.forEach(entry => {
@@ -134,7 +131,7 @@ function AddItemController($scope, $location, ContainerService, InventoryService
 	}
 
 	function postFailMitigate(err) {
-	vm.errorMessage = err.message;
+		vm.errorMessage = err.message;
 	}
 	function postCleanup() { }
 
@@ -156,6 +153,7 @@ function AddItemController($scope, $location, ContainerService, InventoryService
 		vm.upc = "";
 		vm.errorMitigation = false;
 		vm.successMessage = false;
+		vm.upcQueryResolved = false;
 		vm.upcIsRequested = false;
 		vm.showRemoteInfo = false;
 		vm.postIsSent = false;
