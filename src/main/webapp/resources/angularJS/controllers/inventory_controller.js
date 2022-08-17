@@ -36,16 +36,17 @@ function InventoryController($scope, InventoryService) {
 					if (ItemElement.expiryDate.length === 3) { //I did a belt-and-suspenders here.
 						ItemElement.expiryDateObj = InventoryService.generateDateObject(ItemElement.expiryDate);
 						ItemElement.expiryDateString = ItemElement.expiryDateObj.toDateString();
-						if (ItemElement.expiryDateObj < Date.now()) { }
-						ItemElement.warning.concat("This item may be expired!");
+						if (ItemElement.expiryDateObj < Date.now()) {
+							ItemElement.warning = ItemElement.warning.concat("This item may be expired!");
+						}
 					}
 				}
 			}
 			if (ItemElement.containers.length > 1) {
 				if (ItemElement.warning.length > 0) {
-					ItemElement.warning.concat("<br>And ")
+					ItemElement.warning.concat("&#10;And ")
 				}
-				ItemElement.warning.concat("This item may be in more than one container!");
+				ItemElement.warning = ItemElement.warning.concat("This item may be in more than one container!");
 			}
 		});
 		vm.dataArrays.defaultLoad = [...rawReturn];

@@ -29,18 +29,20 @@
 			<div ng-repeat="item in ctrl.displayData" id="inventory-display"
 				class="inventory box display ng-hook">
 				<div ng-attr-id="{{'item-id-'+item.id}}"
-					ng-attr-class="{{'item card'+ item.warning}}">
+					ng-attr-class="{{item.warning?'item card error':'item card'}}">
 					<div>upc: {{item.upc}}</div>
 					<div>name: {{item.naiiveItemName}} - {{item.unit_amount}}
 						{{item.unit}}</div>
 					<div ng-id="{{'item-id-'+ item.id + '-warning'}}"
-						ng-if="item.warning">{{item.warning}}</div>
+						ng-if="item.warning"><pre>{{item.warning}}</pre></div>
 					<div>Expires: {{item.expiryDateString}}</div>
 					<div>Got: {{item.obtainDateString}}</div>
 					<div class="description">
+					<pre>
 						Description:
 						<div>{{item.naiiveItemDescription}}</div>
 					</div>
+					</pre>
 				</div>
 			</div>
 		</div>

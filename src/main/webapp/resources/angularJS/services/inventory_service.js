@@ -34,8 +34,10 @@ function InventoryServiceFactory($http) {
 	function generateDateObject(dateJSONArray){
 		if(dateJSONArray){
 			if(typeof dateJSONArray === "object" && Array.isArray(dateJSONArray)){
-				if(dateJSONArray.length===3)
+				if(dateJSONArray.length===3){
+					dateJSONArray[1]--;
 				return new Date(...dateJSONArray);
+				}
 			}			
 		}
 	}

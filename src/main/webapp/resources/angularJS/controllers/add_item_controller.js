@@ -127,7 +127,7 @@ function AddItemController($scope, $location, ContainerService, InventoryService
 		const data = res.data;
 		const expiryDateObj = InventoryService.generateDateObject(data.expiryDate);
 		const expiryString = expiryDateObj.toDateString();
-		vm.successMessage = `Your ${data.naiiveItemName} has been added!  <br>   Remember that it will expire on: ${expiryString}.`;
+		vm.successMessage = `Your ${data.naiiveItemName} has been added!  \n   Remember that it will expire on: ${expiryString}.`;
 	}
 
 	function postFailMitigate(err) {
