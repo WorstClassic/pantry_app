@@ -30,6 +30,9 @@ public class ItemServiceImpl implements ItemService {
 
 	@Autowired
 	MockData mockdata;
+	
+	@Autowired
+	ItemDAO itemRepo;
 
 	@Override
 	public Item addItemToValidContainer(Item incomingItem, Container incomingContainer) {
@@ -127,6 +130,7 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public List<Item> getAll() {
+		//return itemRepo.getItems();
 		return mockdata.getItems();
 	}
 

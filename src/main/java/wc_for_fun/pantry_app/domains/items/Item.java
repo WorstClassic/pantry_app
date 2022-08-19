@@ -44,6 +44,7 @@ public class Item {
 	private LocalDate expiryDate;
 	
 	@JsonIgnoreProperties(value="contents")
+	@ManyToMany(mappedBy="contents")
 	private List<Container> containers;
 
 	private String naiiveItemName;

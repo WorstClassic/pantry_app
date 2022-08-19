@@ -82,12 +82,12 @@
 				<div id="posting-spinner" class="purple-loading-spinner"></div>
 			</div>
 			<div ng-show="addItem.errorMessage">
-				<pre>{{addItem.errorMessage}}</pre>
+				<span class="api-message error">{{addItem.errorMessage}}</span>
 				<button ng-click="addItem.reopenForm()">I'd like to review
 					my information and try again.</button>
 			</div>
 			<div ng-show="addItem.successMessage">
-				<pre>{{addItem.successMessage}}</pre>
+				<span class="api-message success">{{addItem.successMessage}}</span>
 				<button ng-click="addItem.resetForm()">I'd like to add
 					another item to this container.</button>
 			</div>

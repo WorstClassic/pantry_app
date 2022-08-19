@@ -5,7 +5,7 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-@Entity
+@Embeddable
 public class UPCWrapper {
 
 	private String typeCode;

@@ -38,11 +38,10 @@
 					<div>Expires: {{item.expiryDateString}}</div>
 					<div>Got: {{item.obtainDateString}}</div>
 					<div class="description">
-					<pre>
 						Description:
+						<br>
 						<div>{{item.naiiveItemDescription}}</div>
 					</div>
-					</pre>
 				</div>
 			</div>
 		</div>

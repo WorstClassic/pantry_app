@@ -23,11 +23,12 @@ public class Container {
 		id = newId;
 	}
 
-	private List<Item> contents;// = new ArrayList<Item>();
 
 	private String name;
 
 	@JsonIgnoreProperties(value = "containers")
+	@ManyToMany
+	private List<Item> contents;// = new ArrayList<Item>();
 	public List<Item> getContents() {
 		return contents;
 	}
