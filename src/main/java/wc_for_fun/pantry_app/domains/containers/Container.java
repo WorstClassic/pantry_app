@@ -1,5 +1,6 @@
 package wc_for_fun.pantry_app.domains.containers;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import wc_for_fun.pantry_app.domains.items.Item;
 
 @Entity
-public class Container {
+public class Container implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -27,7 +28,7 @@ public class Container {
 	private String name;
 
 	@JsonIgnoreProperties(value = "containers")
-	@ManyToMany
+	@ManyToMany(cascade= CascadeType.ALL)
 	private List<Item> contents;// = new ArrayList<Item>();
 	public List<Item> getContents() {
 		return contents;

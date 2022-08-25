@@ -15,7 +15,9 @@ public interface ItemService {
 	public List<Item> getAll();
 	public Item getSolo(Long itemId);
 	public Item addItemToValidContainer(Item incomingItem, Container incomingContainer);
-	public boolean hasItemByUPC(String incomingUPC);
+//	public boolean hasItemByUPC(String incomingUPC);
 	public ItemAndSourceDTO getItemByUPC(String incomingUPC);
 	public List<Item> getItemsByUPC(String incomingUPC);
+	
+	public Item updateTargetEntityWithPassedModel(Long targetId, Item incomingItem);
 }

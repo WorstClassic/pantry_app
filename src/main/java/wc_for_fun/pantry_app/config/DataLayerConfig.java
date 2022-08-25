@@ -4,6 +4,8 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -19,7 +21,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class DataLayerConfig {
 
 	@Bean
-	public LocalSessionFactoryBean sessionFactory() {
+	public LocalSessionFactoryBean getSessionFactory() {
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
 		sessionFactory.setDataSource(dataSource());
 		sessionFactory.setPackagesToScan("wc_for_fun.pantry_app");
@@ -52,9 +54,10 @@ public class DataLayerConfig {
 	}
 
 	@Bean
-	public PlatformTransactionManager hibernateTransactionManager() {
+	@Autowired
+	public HibernateTransactionManager hibernateTransactionManager(SessionFactory s) {
 		HibernateTransactionManager transactionManager = new HibernateTransactionManager();
-		transactionManager.setSessionFactory(sessionFactory().getObject());
+		transactionManager.setSessionFactory(s);
 		return transactionManager;
 	}
 
@@ -62,6 +65,9 @@ public class DataLayerConfig {
 		Properties hibernateProperties = new Properties();
 		hibernateProperties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
 		hibernateProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+		hibernateProperties.setProperty("hibernate.show_sql", "true");
+		
+		hibernateProperties.setProperty("javax.persistence.schema-generation.database.action","drop-and-create");
 		return hibernateProperties;
 	}
 }

@@ -21,8 +21,8 @@ public interface ContainerService {
 
 	public Item addItemToContainer(Item incomingItem, Container incomingContainer);
 	
-	public boolean containerExistsByName(Container queryContainer);
-	public boolean containerExistsByName(String queryString);
+	//public boolean containerExistsByName(Container queryContainer);
+	//return nupublic boolean containerExistsByName(String queryString);
 	
 	public Container getContainerByName(String queryString);
 }

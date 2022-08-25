@@ -1,6 +1,7 @@
 package wc_for_fun.pantry_app.domains.containers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,14 +12,16 @@ import wc_for_fun.pantry_app.mockData.MockData;
 @Service
 public class ContainerServiceImpl implements ContainerService {
 
+//	@Autowired
+//	MockData mockdata;
+	
 	@Autowired
-	MockData mockdata;
+	ContainerDAO containerRepo;
 
 	@Override
 	public Container addContainer(Container incomingContainer) {
-		incomingContainer.setId(Long.valueOf(mockdata.getContainers().size()));
-		mockdata.getContainers().add(incomingContainer);
-		return incomingContainer;
+		Optional<Container> tentativeReturn = containerRepo.saveContainer(incomingContainer);
+		return tentativeReturn.orElse(null);
 	}
 
 	/**
@@ -39,47 +42,41 @@ public class ContainerServiceImpl implements ContainerService {
 
 	@Override
 	public Container getSolo(Long containerId) {
-		try {
-			return mockdata.getContainers().get(containerId.intValue());
-		} catch (IndexOutOfBoundsException e) {
-			System.out.println("Out of bounds Id.");
-		}
-		return null;
+		return containerRepo.getContainerById(containerId).orElse(null);
 	}
 
 	@Override
 	public List<Container> getAll() {
-		return mockdata.getContainers();
+		return containerRepo.getContainers();
 	}
 
-	@Override
-	/**
-	 * Call relies on valid name on queryContainer
-	 * 
-	 */
-	public boolean containerExistsByName(Container queryContainer) {
-		for (Container element : mockdata.getContainers()) {
-			if (queryContainer.getName().equalsIgnoreCase(element.getName()))
-				return true;
-		}
-		return false;
-	}
-
-	public boolean containerExistsByName(String queryString) {
-		for (Container element : mockdata.getContainers()) {
-			if (queryString.equalsIgnoreCase(element.getName()))
-				return true;
-		}
-		return false;
-	}
+//	@Override
+//	/**
+//	 * Call relies on valid name on queryContainer
+//	 * 
+//	 */
+//	public boolean containerExistsByName(Container queryContainer) {
+//		for (Container element : mockdata.getContainers()) {
+//			if (queryContainer.getName().equalsIgnoreCase(element.getName()))
+//				return true;
+//		}
+//		return false;
+//	}
+//
+//	public boolean containerExistsByName(String queryString) {
+//		for (Container element : mockdata.getContainers()) {
+//			if (queryString.equalsIgnoreCase(element.getName()))
+//				return true;
+//		}
+//		return false;
+//	}
 
 	@Override
 	public Container getContainerByName(String queryString) {
-		for (Container element : mockdata.getContainers()) {
-			if (queryString.equalsIgnoreCase(element.getName()))
-				return element;
-		}
-		return null;
+		List<Container> retrievedResults = containerRepo.getContainersByName(queryString);
+		if(retrievedResults.isEmpty()) return null;
+		if(retrievedResults.size()!=1) return null; //Collision handling later.
+		return retrievedResults.get(0);
 	}
 
 }

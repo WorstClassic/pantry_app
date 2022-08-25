@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,54 +29,23 @@ public class ItemServiceImpl implements ItemService {
 	@Autowired
 	ContainerService containerService;
 
-	@Autowired
-	MockData mockdata;
-	
+//	@Autowired
+//	MockData mockdata;
+//	
 	@Autowired
 	ItemDAO itemRepo;
 
 	@Override
 	public Item addItemToValidContainer(Item incomingItem, Container incomingContainer) {
-		if (incomingItem != null) {
-//			Container containerReference = null;
-//			if (incomingContainer != null) {
-//				String queryString = incomingContainer.getName();
-//				if (queryString == null || queryString.isEmpty()
-//						|| !containerService.containerExistsByName(queryString)) {
-//					// TODO with real logging.
-//					System.out.println("Container unposted");
-//					return null; // break due to un-posted container.
-//				}
-//				containerReference = containerService.getContainerByName(queryString);
-//			}
-			incomingItem = inferDefaults(incomingItem);
-			// assignment not necessary since inferDefaults is naughty and mutates an object
-			// rather than newing up a fresh one.
-			UPCWrapper incomingUPC = incomingItem.getUpc();
-			if (incomingUPC == null)
-				return null; // break due to invalid incoming item.
-			String incomingUPCString = incomingUPC.toString();
-			if (hasItemByUPC(incomingUPCString)) { // item has at least one listing.
-				List<Item> listOfExistingItems = getItemsByUPC(incomingUPCString);
-				List<Container> clonedList = new ArrayList<>();
-				clonedList.addAll(listOfExistingItems.get(0).getContainers());
-				incomingItem.setContainers(clonedList);
-				listOfExistingItems.add(incomingItem);
-				if (updateContainingInventories(listOfExistingItems, incomingContainer)) {
-					// TODO log success?
-					System.out.println("Successful add of item to inventory.");
-				}
-			} else { // case no current listings.
-				ArrayList<Container> cleanContainerInventory = new ArrayList<>();
-				cleanContainerInventory.add(incomingContainer);
-				incomingItem.setContainers(cleanContainerInventory);
-				containerService.addItemToContainer(incomingItem, incomingContainer);
-			}
-			incomingItem.setId(Long.valueOf(mockdata.getItems().size()));
-			mockdata.getItems().add(incomingItem);
-			return incomingItem;
+		try {
+		itemRepo.saveItem(incomingItem);
 		}
-		return null;
+		catch (Exception e) {
+			//TODO real error handling.
+		}
+		incomingContainer.addAnItem(incomingItem);
+		incomingItem.getContainers().add(incomingContainer);
+		return incomingItem;
 	}
 
 	/**
@@ -130,15 +100,16 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public List<Item> getAll() {
-		//return itemRepo.getItems();
-		return mockdata.getItems();
+		return itemRepo.getItems();
+		// return mockdata.getItems();
 	}
 
 	@Override
 	public Item getSolo(Long itemId) {
 		try {
-			return mockdata.getItems().get(itemId.intValue());
-		} catch (IndexOutOfBoundsException e) {
+			Optional<Item> retrievedItem = itemRepo.findById(itemId);
+			return retrievedItem.orElse(null);
+		} catch (Exception e) {
 			return null;
 		}
 	}
@@ -149,11 +120,8 @@ public class ItemServiceImpl implements ItemService {
 	 */
 	public ItemAndSourceDTO getItemByUPC(String incomingUPC) {
 		Item tentativeItem = null;
-		for (Item item : mockdata.getItems())
-			if (item.getUpc().toString().equalsIgnoreCase(incomingUPC)) {
-				tentativeItem = item;
-				break;
-			}
+		List<Item> retrievedItems = itemRepo.findAllByUpc(incomingUPC);
+		if(retrievedItems.size()==1) tentativeItem= retrievedItems.get(0);
 		if (tentativeItem != null) {
 			ItemAndSourceDTO readyToReturn = new ItemAndSourceDTO();
 			readyToReturn.setItem(tentativeItem);
@@ -188,24 +156,17 @@ public class ItemServiceImpl implements ItemService {
 		return fourOfour;
 	}
 
-	@Override
-	public boolean hasItemByUPC(String incomingUPC) {
-		for (Item item : mockdata.getItems())
-			if (item.getUpc().equals(incomingUPC))
-				return true;
-		return false;
-	}
+//	@Override
+//	public boolean hasItemByUPC(String incomingUPC) {
+//		for (Item item : mockdata.getItems())
+//			if (item.getUpc().equals(incomingUPC))
+//				return true;
+//		return false;
+//	}
 
 	@Override
 	public List<Item> getItemsByUPC(String incomingUPC) {
-		ArrayList<Item> returnList = new ArrayList<>();
-		for (Item item : mockdata.getItems())
-			if (item.getUpc().toString().equalsIgnoreCase(incomingUPC))
-				if (!returnList.add(item)) {
-					// TODO clean this loggish stub.
-					System.out.println("Something weird happened on add to list");
-				}
-		return returnList;
+		return itemRepo.findAllByUpc(incomingUPC);
 	}
 
 	private Item convertResponseToItem(Response incomingResponse) {

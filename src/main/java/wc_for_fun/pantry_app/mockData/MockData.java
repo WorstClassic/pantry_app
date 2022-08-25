@@ -5,10 +5,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import wc_for_fun.pantry_app.domains.containers.Container;
+import wc_for_fun.pantry_app.domains.containers.ContainerDAO;
 import wc_for_fun.pantry_app.domains.items.Item;
+import wc_for_fun.pantry_app.domains.items.ItemDAO;
 import wc_for_fun.pantry_app.domains.items.UPCWrapper;
 
 /**
@@ -18,34 +29,25 @@ import wc_for_fun.pantry_app.domains.items.UPCWrapper;
  *
  */
 @Component
-public class MockData {
-	private static ArrayList<Item> Items;
-	private static ArrayList<Container> Containers;
+public class MockData implements ApplicationListener<ContextRefreshedEvent> {
 
-	static {
-		whyDidDataloaderFailMe();
-	}
+	
+	@Autowired
+	SessionFactory sessionFactory;
+	@Autowired
+	private ItemDAO itemRepo;
+	@Autowired
+	private ContainerDAO containerRepo;
 
-	public List<Item> getItems() {
-		return Items;
-	}
-
-	public void setItems(ArrayList<Item> items) {
-		Items = items;
-	}
-
-	public List<Container> getContainers() {
-		return Containers;
-	}
-
-	public void setContainers(ArrayList<Container> containers) {
-		Containers = containers;
-	}
-
-	private static void whyDidDataloaderFailMe() {
+	@Override
+	@Transactional
+	public void onApplicationEvent(ContextRefreshedEvent event) {
 		// Items should be ingredients to be used against recipe in:
 		// https://cooking.nytimes.com/recipes/1893-everyday-pancakes
-		
+
+		if(!containerRepo.getContainers().isEmpty()) {
+			return;
+		}
 		ArrayList<Container> containersList = new ArrayList<>();
 		Container TopShelf = new Container();
 		TopShelf.setName("TopShelf");
@@ -56,7 +58,10 @@ public class MockData {
 		containersList.add(TopShelf);
 		containersList.add(MiddleShelf);
 		containersList.add(Fridge);
-		
+
+//		for (Container entry : containersList) {
+//			entry = containerRepo.saveContainer(entry).get();
+//		}
 
 		LocalDate now = LocalDate.now();
 		LocalDate twoDaysAgo = now.minusDays(2);
@@ -64,9 +69,8 @@ public class MockData {
 		LocalDate oneWeekFromNow = now.plusWeeks(1);
 		LocalDate twoYearsFromNow = now.plusYears(2);
 
-		
 		ArrayList<Item> itemsList = new ArrayList<>();
-		
+
 		Item mortonsNoniodizedSalt = new Item();
 		mortonsNoniodizedSalt.setUpc(new UPCWrapper("024600010016"));
 		mortonsNoniodizedSalt.setObtainDate(twoWeeksAgo);
@@ -90,7 +94,7 @@ public class MockData {
 		prairieFarmsTwoPercent.setNaiiveUnit("FlOz");
 		prairieFarmsTwoPercent.setNaiiveUnitValue("128");
 		itemsList.add(prairieFarmsTwoPercent);
-		
+
 		Item ChallengeButter = new Item();
 		ChallengeButter.setUpc(new UPCWrapper("047200152603"));
 		ChallengeButter.setObtainDate(twoWeeksAgo);
@@ -102,7 +106,7 @@ public class MockData {
 		ChallengeButter.setNaiiveUnit("Oz");
 		ChallengeButter.setNaiiveUnitValue("16");
 		itemsList.add(ChallengeButter);
-		
+
 		Item greatValueEggs = new Item();
 		greatValueEggs.setUpc(new UPCWrapper("078742127088"));
 		greatValueEggs.setObtainDate(twoDaysAgo);
@@ -114,7 +118,7 @@ public class MockData {
 		greatValueEggs.setNaiiveUnit("Large Egg");
 		greatValueEggs.setNaiiveUnitValue("18");
 		itemsList.add(greatValueEggs);
-		
+
 		Item allPurposeFlour = new Item();
 		allPurposeFlour.setUpc(new UPCWrapper("016000106109"));
 		allPurposeFlour.setObtainDate(twoDaysAgo);
@@ -126,7 +130,7 @@ public class MockData {
 		allPurposeFlour.setNaiiveUnit("lbs");
 		allPurposeFlour.setNaiiveUnitValue("5");
 		itemsList.add(allPurposeFlour);
-		
+
 		Item bakingPowder = new Item();
 		bakingPowder.setUpc(new UPCWrapper("041617007181"));
 		bakingPowder.setObtainDate(twoDaysAgo);
@@ -138,20 +142,37 @@ public class MockData {
 		bakingPowder.setNaiiveUnit("Oz");
 		bakingPowder.setNaiiveUnitValue("8.1");
 		itemsList.add(bakingPowder);
+
+//		for (Item entry : itemsList) {
+//			entry = itemRepo.saveItem(entry).get();
+//		}
+//		for (Container entry : containersList) {
+//			containerRepo.saveContainer(entry);
+//		}
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		for (Container entry : containersList) {
+			session.save(entry);
+	}
+		tx.commit();
+		//session.flush();
+		session.close();
+		//Did this work and the others not because save wasn't opening a session?
 		
-		int greatersize = itemsList.size();
-		int lessersize = containersList.size();
-		// Don't forget that you're assuming itemslist is going to always be larger.
-		for(int i=0 ; i< lessersize; i++) {
-			Long index = Long.valueOf(i); // We're not even pretending to be an SQL DB, so why bother with a valid ID?
-			containersList.get(i).setId(index);
-			itemsList.get(i).setId(index);
-		}
-		for(int i=lessersize; i<greatersize;i++) {
-			itemsList.get(i).setId(Long.valueOf(i));
-		}
-		
-		Containers = containersList;
-		Items = itemsList;
+
+//		int greatersize = itemsList.size();
+//		int lessersize = containersList.size();
+//		// Don't forget that you're assuming itemslist is going to always be larger.
+//		for(int i=0 ; i< lessersize; i++) {
+//			Long index = Long.valueOf(i); // We're not even pretending to be an SQL DB, so why bother with a valid ID?
+//			containersList.get(i).setId(index);
+//			itemsList.get(i).setId(index);
+//		}
+//		for(int i=lessersize; i<greatersize;i++) {
+//			itemsList.get(i).setId(Long.valueOf(i));
+//		}
+//		
+//		Containers = containersList;
+//		Items = itemsList;
 	}
 }
