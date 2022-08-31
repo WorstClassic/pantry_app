@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
@@ -23,6 +24,10 @@ public class ContainerDAOImpl implements ContainerDAO {
 	@Autowired
 	SessionFactory sessionFactory;
 
+	private static final String[] containerKeySet = { "id", "name" };
+
+	private static final String GET_BY_ID = "from Container c LEFT JOIN FETCH c.contents WHERE c.id=:id";
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<Container> getContainers() {
@@ -36,14 +41,17 @@ public class ContainerDAOImpl implements ContainerDAO {
 	@Override
 	@Transactional
 	public Optional<Container> saveContainer(Container newContainer) {
-		// Transaction tx = null;
+		Transaction tx = null;
 		Session addSession = sessionFactory.openSession();
 
 		try {
+			tx=addSession.beginTransaction();
 			Serializable createdContainer = addSession.save(newContainer);
 			if (newContainer.getId() == null) {
 				System.out.println("where did the thing go?");
 			}
+			addSession.flush();
+			tx.commit();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		} finally {
@@ -57,7 +65,16 @@ public class ContainerDAOImpl implements ContainerDAO {
 	@Transactional
 	public Optional<Container> updateContainer(Container updatedContainer) {
 		Session updateSession = sessionFactory.openSession();
-		updateSession.saveOrUpdate(updatedContainer);
+		Transaction tx = null;
+		try {
+			tx = updateSession.beginTransaction();
+			updateSession.saveOrUpdate(updatedContainer);
+			updateSession.flush();
+			tx.commit();
+		} catch (Exception e) {
+			System.out.println("O boy what happened?");
+		}
+updateSession.close();
 		return Optional.of(updatedContainer);
 	}
 
@@ -68,8 +85,7 @@ public class ContainerDAOImpl implements ContainerDAO {
 
 		if (idOfContainer == null || idOfContainer.equals(Long.valueOf(0)))
 			return Optional.empty();
-		TypedQuery<Container> query = deleteSession
-				.createQuery("SELECT c FROM Container LEFT JOIN FETCH c.contents WHERE i.id=:id");
+		TypedQuery<Container> query = deleteSession.createQuery(GET_BY_ID);
 		query.setParameter("id", idOfContainer);
 		Container managedContainer = null;
 		try {
@@ -77,8 +93,19 @@ public class ContainerDAOImpl implements ContainerDAO {
 		} catch (Exception e) {
 			System.out.println("ExceptionHandlingHolder");
 		}
+		Transaction tx = null;
 		try {
-			deleteSession.delete(managedContainer);
+			tx = deleteSession.getTransaction();
+			tx.begin();
+			Query deleteQuery = deleteSession.createQuery("DELETE FROM Container WHERE id = :id");
+			deleteQuery.setParameter("id", idOfContainer);
+			int deleteCheck = deleteQuery.executeUpdate();
+			if (deleteCheck == 1) {
+				deleteSession.flush();
+				tx.commit();
+			} else {
+				tx.rollback();
+			}
 		} catch (Exception e) {
 			System.out.println("ExceptionHandlingHolder");
 		} finally {
@@ -91,11 +118,16 @@ public class ContainerDAOImpl implements ContainerDAO {
 	@Transactional(readOnly = true)
 	public Optional<Container> getContainerById(Long idOfContainer) {
 		Session getIdSession = sessionFactory.openSession();
-		TypedQuery<Container> insertSafeId = getIdSession
-				.createQuery("from Container c LEFT JOIN FETCH c.contents WHERE id=:id");
+		TypedQuery<Container> insertSafeId = getIdSession.createQuery(GET_BY_ID);
 		insertSafeId.setParameter("id", idOfContainer);
-
-		return Optional.ofNullable(insertSafeId.getSingleResult());
+		Container tentativeResult = null;
+		try {
+			tentativeResult = insertSafeId.getSingleResult();
+		} catch (NoResultException e) {
+			return Optional.empty();
+		}
+		getIdSession.close();
+		return Optional.of(tentativeResult);
 	}
 
 	@Override

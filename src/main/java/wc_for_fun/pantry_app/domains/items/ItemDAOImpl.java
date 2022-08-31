@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.Parameter;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -38,6 +39,10 @@ public class ItemDAOImpl implements ItemDAO {
 //	@PersistenceContext
 //	private EntityManager entityManager;
 
+	private static final String[] itemKeySet = { "id", "upc.typeCode", "upc.checkUPC", "upc.manufacturerUPC",
+			"upc.productUPC", "obtainDate", "expiryDate", "naiiveItemName", "naiiveItemDescription", "unit",
+			"unit_amount" };
+
 	@Transactional(readOnly = true)
 	@Override
 	public List<Item> getItems() {
@@ -53,22 +58,32 @@ public class ItemDAOImpl implements ItemDAO {
 	public Optional<Item> findById(Long idOfItem) {
 		Session findByIdSession = sessionFactory.openSession();
 		TypedQuery<Item> query = findByIdSession
-				.createQuery("SELECT i FROM Item LEFT JOIN FETCH i.containers WHERE i.id=:id");
+				.createQuery("SELECT i FROM Item as i LEFT JOIN FETCH i.containers WHERE i.id=:id");
 		query.setParameter("id", idOfItem);
-		return Optional.ofNullable(query.getSingleResult());
+		Item tentativeReturn=null;
+		try {
+			tentativeReturn = query.getSingleResult();
+		} catch (NoResultException e) {
+			System.out.println("ErrorLogginCase");
+		}
+		findByIdSession.close();
+		return Optional.of(tentativeReturn);
 	}
 
 	@Transactional
 	@Override
 	public Optional<Item> saveItem(Item newItem) {
-		// Transaction tx = null;
+		Transaction tx = null;
 		Session addSession = sessionFactory.openSession();
 
 		try {
+			tx = addSession.beginTransaction();
 			addSession.save(newItem);
 			if (newItem.getId() == null) {
 				System.out.println("where did the thing go?");
 			}
+			addSession.flush();
+			tx.commit();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		} finally {
@@ -83,27 +98,16 @@ public class ItemDAOImpl implements ItemDAO {
 	@Transactional
 	public Optional<Item> updateItem(Item updatedItem) {
 		Session updateSession = sessionFactory.openSession();
-//		Long idOfItem = updatedItem.getId();
-//		if (idOfItem == null || idOfItem.equals(Long.valueOf(0)))
-//			return Optional.empty();
-//		TypedQuery<Item> query = updateSession
-//				.createQuery("SELECT i FROM Item LEFT JOIN FETCH i.containers WHERE i.id=:id");
-//		query.setParameter("id", idOfItem);
-//
-//		Item managedItem = null;
-//		try {
-//			managedItem = query.getSingleResult();
-//		} catch (Exception e) {
-//			System.out.println("ExceptionHandlingHolder");
-//		}
-//		
-//		managedItem.updatePropertiesFromItem(updatedItem);
-//		
-//		updateSession.saveOrUpdate(managedItem);
-//		
-//		return Optional.of(managedItem);
-		
-		updateSession.saveOrUpdate(updatedItem);
+		Transaction tx = null;
+		try {
+			tx = updateSession.beginTransaction();
+			updateSession.saveOrUpdate(updatedItem);
+			updateSession.flush();
+			tx.commit();
+		} catch (Exception e) {
+			System.out.println("O boy, what happened?");
+		}
+		updateSession.close();
 		return Optional.of(updatedItem);
 	}
 
@@ -115,21 +119,50 @@ public class ItemDAOImpl implements ItemDAO {
 		if (idOfItem == null || idOfItem.equals(Long.valueOf(0)))
 			return Optional.empty();
 		TypedQuery<Item> query = deleteSession
-				.createQuery("SELECT i FROM Item LEFT JOIN FETCH i.containers WHERE i.id=:id");
+				.createQuery("SELECT i FROM Item as i LEFT JOIN FETCH i.containers WHERE i.id=:id");
 		query.setParameter("id", idOfItem);
 		Item managedItem = null;
 		try {
 			managedItem = query.getSingleResult();
+			if(managedItem==null) {
+				deleteSession.close();
+				return Optional.empty();
+			}
 		} catch (Exception e) {
 			System.out.println("ExceptionHandlingHolder");
 		}
+		Transaction tx = null;
 		try {
+			tx = deleteSession.getTransaction();
+			tx.begin();
+			if(!managedItem.getContainers().isEmpty()) {
+//				Query pivotCleanup = deleteSession.createQuery("DELETE FROM Container_Item where contents_id = :itemId ");
+//				pivotCleanup.setParameter("itemId", idOfItem);
+//				pivotCleanup.executeUpdate();
+				for(Container holdingContainer : managedItem.getContainers()) {
+					holdingContainer.getContents().remove(managedItem);
+					deleteSession.saveOrUpdate(holdingContainer);
+				}
+				managedItem.getContainers().clear();
+				deleteSession.saveOrUpdate(managedItem);
+			}
 			deleteSession.delete(managedItem);
+//			Query deleteQuery = deleteSession.createQuery("DELETE FROM Item WHERE id = :id");
+//			deleteQuery.setParameter("id", idOfItem);
+//			int deleteCheck = deleteQuery.executeUpdate();
+//			if (deleteCheck == 1) {
+//				deleteSession.flush();
+//				tx.commit();
+//			} else {
+//				tx.rollback();
+//			}
+			deleteSession.flush();
+			tx.commit();
 		} catch (Exception e) {
+			tx.rollback();
 			System.out.println("ExceptionHandlingHolder");
-		} finally {
-			deleteSession.close();
 		}
+		deleteSession.close();
 		return Optional.of(managedItem);
 	}
 

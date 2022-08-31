@@ -18,6 +18,8 @@ public interface ItemService {
 //	public boolean hasItemByUPC(String incomingUPC);
 	public ItemAndSourceDTO getItemByUPC(String incomingUPC);
 	public List<Item> getItemsByUPC(String incomingUPC);
+	public Item deleteItemById(Long targetId);
 	
 	public Item updateTargetEntityWithPassedModel(Long targetId, Item incomingItem);
+	public Item inferDefaults(Item incomingItem);
 }

@@ -43,6 +43,11 @@ public class HomeController {
 	public String getInventory(ModelMap model) {
 		return "inventory_page";
 	}
+	
+	@RequestMapping(value="inventory/{id}")
+	public String getItemEdit(ModelMap model) {
+		return "edit_item_page";
+	}
 
 	@RequestMapping(value = "containers")
 	public String getContainers(ModelMap model) {

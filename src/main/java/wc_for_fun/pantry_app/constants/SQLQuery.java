@@ -17,7 +17,31 @@ public class SQLQuery {
 			Iterator<String> traverseKeys = attributesKeySet.iterator();
 			while (traverseKeys.hasNext()) {
 				String key = traverseKeys.next();
-				queryStringSnippet = queryStringSnippet + String.format("%1$s= :%1$s", key);
+				queryStringSnippet = queryStringSnippet + String.format("u.%1$s= :%1$s", key);
+				//realize I'm not 100% sure if there's a performance hit I'm taking for doing it this way.
+				if(traverseKeys.hasNext()) {
+					queryStringSnippet= queryStringSnippet + ", ";
+				}
+			}
+			return queryStringSnippet;
+		}
+		return null;
+	}
+	
+	/**
+	 * Not DRY but...
+	 * Realized probably wanted the alias configurable.
+	 * @param attributesKeySet
+	 * @param rowAlias
+	 * @return
+	 */
+	public static final String generateAttributeMappingString(Iterable<String> attributesKeySet, String rowAlias) {
+		if (attributesKeySet != null) {
+			String queryStringSnippet = "";
+			Iterator<String> traverseKeys = attributesKeySet.iterator();
+			while (traverseKeys.hasNext()) {
+				String key = traverseKeys.next();
+				queryStringSnippet = queryStringSnippet + String.format("%2$s.%1$s= :%1$s", key, rowAlias);
 				//realize I'm not 100% sure if there's a performance hit I'm taking for doing it this way.
 				if(traverseKeys.hasNext()) {
 					queryStringSnippet= queryStringSnippet + ", ";

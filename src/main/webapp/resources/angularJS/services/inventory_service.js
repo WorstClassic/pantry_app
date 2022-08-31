@@ -12,8 +12,10 @@ function InventoryServiceFactory($http) {
 	const factory = {
 		getAllItems: getAllItems,
 		getItemById: getItemById,
-		getItemByUpc:getItemByUpc,
-		
+		putItem: putItem,
+		deleteItem: deleteItem,
+		getItemByUpc: getItemByUpc,
+
 		generateDateObject: generateDateObject
 	};
 
@@ -26,19 +28,27 @@ function InventoryServiceFactory($http) {
 	function getItemById(idValue) {
 		return $http.get(`${API_ROOT}${ITEM}\\${idValue}`);
 	}
-	
-		function getItemByUpc(upc) {
+
+	function getItemByUpc(upc) {
 		return $http.get(`${API_ROOT}${ITEM}${UPC}\\${upc}`);
 	}
-	
-	function generateDateObject(dateJSONArray){
-		if(dateJSONArray){
-			if(typeof dateJSONArray === "object" && Array.isArray(dateJSONArray)){
-				if(dateJSONArray.length===3){
+
+	function putItem(updatedItem) {
+		return $http.put(`${API_ROOT}${ITEM}/${updatedItem.id}`, updatedItem);
+	}
+
+	function deleteItem(deletedItem) {
+		return $http.delete(`${API_ROOT}${ITEM}/${deletedItem.id}`);
+	}
+
+	function generateDateObject(dateJSONArray) {
+		if (dateJSONArray) {
+			if (typeof dateJSONArray === "object" && Array.isArray(dateJSONArray)) {
+				if (dateJSONArray.length === 3) {
 					dateJSONArray[1]--;
-				return new Date(...dateJSONArray);
+					return new Date(...dateJSONArray);
 				}
-			}			
+			}
 		}
 	}
 

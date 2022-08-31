@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Inventory</title>
-
+<link href="/pantry_app/resources/css/style.css" rel="stylesheet">
 <!-- AngularJS -->
 <script
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.js"></script>
@@ -39,9 +39,15 @@
 		</div>
 		<div ng-repeat="container in ctrl.containers"
 			class="container box display ng-hook" id="container-display">
-			<h2>{{container.name}}</h2>
-			<a ng-href="./containers/{{container.id}}/new-item"> Add an Item
-				to This Container </a>
+			<div><h2>{{container.name}}</h2>
+				<button ng-click="container.editName=true">Change Name or Delete</button>
+				<div ng-show="container.editName">
+					<input type="text" ng-model="container.newName" placeholder="What will the new name be?">
+					<button ng-click="ctrl.updateContainer($event, container)">Attempt to update the name</button>
+					<div ng-show="container.updateError">SOMETHING WENT WRONG</div>
+					<button ng-click="ctrl.deleteContainer($event, container)">Delete it</button>
+				</div> </div> 
+				<a ng-href="./containers/{{container.id}}/new-item"> Add an Item to This Container </a>
 			<div ng-attr-id="{{'container-id-'+ container.id}}"
 				class="container card entry">
 				<div ng-repeat="item in container.contents">

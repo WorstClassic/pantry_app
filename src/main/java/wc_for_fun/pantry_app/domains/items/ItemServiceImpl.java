@@ -37,15 +37,16 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public Item addItemToValidContainer(Item incomingItem, Container incomingContainer) {
+		inferDefaults(incomingItem);
 		try {
-		itemRepo.saveItem(incomingItem);
-		}
-		catch (Exception e) {
-			//TODO real error handling.
+			itemRepo.saveItem(incomingItem);
+		} catch (Exception e) {
+			// TODO real error handling.
 		}
 		incomingContainer.addAnItem(incomingItem);
 		incomingItem.getContainers().add(incomingContainer);
-		return incomingItem;
+		
+		return itemRepo.updateItem(incomingItem).get();
 	}
 
 	/**
@@ -121,7 +122,8 @@ public class ItemServiceImpl implements ItemService {
 	public ItemAndSourceDTO getItemByUPC(String incomingUPC) {
 		Item tentativeItem = null;
 		List<Item> retrievedItems = itemRepo.findAllByUpc(incomingUPC);
-		if(retrievedItems.size()==1) tentativeItem= retrievedItems.get(0);
+		if (retrievedItems.size() == 1)
+			tentativeItem = retrievedItems.get(0);
 		if (tentativeItem != null) {
 			ItemAndSourceDTO readyToReturn = new ItemAndSourceDTO();
 			readyToReturn.setItem(tentativeItem);
@@ -185,12 +187,44 @@ public class ItemServiceImpl implements ItemService {
 		}
 	}
 
-	private Item inferDefaults(Item incomingItem) {
+	@Override
+	public Item inferDefaults(Item incomingItem) {
+		if (incomingItem.getContainers() == null)
+			incomingItem.setContainers(new ArrayList<>());
 		if (incomingItem.getObtainDate() == null)
 			incomingItem.setObtainDate(LocalDate.now());
 		if (incomingItem.getExpiryDate() == null)
 			incomingItem.setExpiryDate(incomingItem.getObtainDate().plusDays(5));
 		return incomingItem;
+	}
+
+//	private Optional<Item> loadFromRepo(Long getById){
+//		try {
+//		return itemRepo.findById(getById);
+//		} catch(Exception e) {
+//			System.out.println("We hit a catch in service");
+//		}
+//		return Optional.empty();
+//	}
+
+	@Override
+	public Item updateTargetEntityWithPassedModel(Long targetId, Item incomingItem) {
+		Item existingItem = getSolo(targetId);
+		if(existingItem==null) return null;
+		if(!existingItem.getId().equals(incomingItem.getId())) {
+			System.out.println("Id discrepancy on PUT");
+			incomingItem.setId(Long.valueOf(0));
+			return incomingItem;
+		}
+		existingItem.updatePropertiesFromItem(incomingItem); //this is a lot of work just to transfer a bag over.
+		return itemRepo.updateItem(existingItem).get();
+	}
+
+	@Override
+	public Item deleteItemById(Long targetId) {
+		Item existingItem = getSolo(targetId);
+		if(existingItem==null) return null;
+		return itemRepo.deleteItem(targetId).get();
 	}
 
 }

@@ -14,6 +14,8 @@ import wc_for_fun.pantry_app.domains.items.Item;
 public interface ContainerService {
 	
 	public Container getSolo(Long containerId);
+	public Container updateTargetEntityWithPassedModel(Long targetId, Container incomingContainer);
+	public Container deleteContainerById(Long targetId);
 	
 	public List<Container> getAll();
 	

@@ -6,12 +6,13 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import wc_for_fun.pantry_app.domains.items.Item;
 
 @Entity
-public class Container implements Serializable{
+public class Container implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -24,12 +25,12 @@ public class Container implements Serializable{
 		id = newId;
 	}
 
-
 	private String name;
 
 	@JsonIgnoreProperties(value = "containers")
-	@ManyToMany(cascade= CascadeType.ALL)
+	@ManyToMany(cascade = CascadeType.ALL)
 	private List<Item> contents;// = new ArrayList<Item>();
+
 	public List<Item> getContents() {
 		return contents;
 	}
@@ -58,5 +59,13 @@ public class Container implements Serializable{
 		if (contents == null)
 			contents = new ArrayList<Item>();
 		return contents.add(addMe);
+	}
+
+	public void updateProperties(Container updateData) {
+		if (updateData == null)
+			return;
+		if (updateData.getName() != null)
+			if (!updateData.getName().isEmpty())
+				this.name = updateData.getName();
 	}
 }

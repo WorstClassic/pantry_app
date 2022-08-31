@@ -14,7 +14,7 @@ public class ContainerServiceImpl implements ContainerService {
 
 //	@Autowired
 //	MockData mockdata;
-	
+
 	@Autowired
 	ContainerDAO containerRepo;
 
@@ -31,13 +31,15 @@ public class ContainerServiceImpl implements ContainerService {
 	 */
 	@Override
 	public Item addItemToContainer(Item incomingItem, Container incomingContainer) {
-		if (incomingContainer.addAnItem(incomingItem))
-			if (incomingItem.getContainers().contains(incomingContainer)) {
-				return incomingItem;
-			} else {
-				System.out.println("We didn't correctly back-reference the container and I don't want to create responsibility confusion.");
-			}
-		return null;
+		incomingContainer.addAnItem(incomingItem);
+		Container savedContainer = containerRepo.updateContainer(incomingContainer).get();
+		return incomingItem;
+//			if (incomingItem.getContainers().contains(incomingContainer)) {
+//			} else {
+//			System.out.println(
+//					"We didn't correctly back-reference the container and I don't want to create responsibility confusion.");
+//		}
+//			return null;
 	}
 
 	@Override
@@ -74,9 +76,38 @@ public class ContainerServiceImpl implements ContainerService {
 	@Override
 	public Container getContainerByName(String queryString) {
 		List<Container> retrievedResults = containerRepo.getContainersByName(queryString);
-		if(retrievedResults.isEmpty()) return null;
-		if(retrievedResults.size()!=1) return null; //Collision handling later.
+		if (retrievedResults.isEmpty())
+			return null;
+		if (retrievedResults.size() != 1)
+			return null; // Collision handling later.
 		return retrievedResults.get(0);
+	}
+
+	@Override
+	public Container updateTargetEntityWithPassedModel(Long targetId, Container incomingContainer) {
+		Container existingContainer = getSolo(targetId);
+		if (existingContainer == null)
+			return null;
+		if (!existingContainer.getId().equals(incomingContainer.getId())) {
+			System.out.println("Id discrepancy on PUT");
+			incomingContainer.setId(Long.valueOf(0));
+			return incomingContainer;
+		}
+		try {
+			existingContainer.updateProperties(incomingContainer);
+		return containerRepo.updateContainer(existingContainer).get();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
+
+	@Override
+	public Container deleteContainerById(Long targetId) {
+		Container existingContainer = getSolo(targetId);
+		if (existingContainer == null)
+			return null;
+		return containerRepo.deleteContainer(targetId).get();
 	}
 
 }
