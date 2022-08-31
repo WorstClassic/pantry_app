@@ -1,13 +1,16 @@
 'use strict';
 
-angular.module("PantryApp").controller("EditItemController", ["$scope", "$location", "ContainerService", "InventoryService", EditItemController
+angular.module("PantryApp").controller("EditItemController", ["$scope","$window", "$location", "ContainerService", "InventoryService", EditItemController
 ]);
+//EditItemController.$inject = ['$window'];
 
-function EditItemController($scope, $location, ContainerService, InventoryService) {
+function EditItemController($scope, $window, $location, ContainerService, InventoryService) {
 
 	const upcValidateRegex = /^\d{12}$/;
 
 	const vm = this;
+
+
 	vm.workingItem = {};
 	vm.initialItem = {};
 	vm.upcQueryResponse = {};
@@ -97,7 +100,7 @@ function EditItemController($scope, $location, ContainerService, InventoryServic
 	function submitUpdates(event) {
 		event.preventDefault();
 		vm.putIsSent = true;
-		const putBody = { upc: vm.upc };
+		const putBody = { ...vm.workingItem };
 		vm.displayOrderer.forEach(entry => formatArguments(entry, putBody));
 		putEntry(putBody).then(putSuccess, putFailMitigate).finally(putCleanup);
 	}
@@ -121,7 +124,8 @@ function EditItemController($scope, $location, ContainerService, InventoryServic
 
 	function upcCallComplete() {
 		vm.upcQueryResolved = true;
-		vm.showRemoteInfo = (vm.upcQueryResponse.source != "LOCAL_CACHE");
+		vm.upcIsRequested = false;
+		vm.showRemoteInfo = true; //(vm.upcQueryResponse.source != "LOCAL_CACHE");
 		if (!vm.showRemoteInfo) { //TODO Lotta ! that could be omitted by renaming the boolean.
 			vm.displayOrderer.forEach(entry => {
 				if (entry.copy === undefined) {
@@ -152,11 +156,15 @@ function EditItemController($scope, $location, ContainerService, InventoryServic
 
 
 	function putEntry(putBody) {
-		return ItemService.putItem(putBody);
+		return InventoryService.putItem(putBody);
 	}
-	
-	function deleteEntry(putBody){
-		return ItemService.deleteItem(putBody.id);
+
+	function deleteEntry(event) {
+		event.preventDefault();
+		InventoryService.deleteItem(vm.initialItem)
+			.then(function deleteSuccess(res) {
+				navigateToInventoryPage();
+			}, function deleteFail(err) { });
 	}
 
 	function stopEditingUpc() {
@@ -178,7 +186,7 @@ function EditItemController($scope, $location, ContainerService, InventoryServic
 		vm.putIsSent = false;
 	};
 	function navigateToInventoryPage() {
-		$location.path("/inventory");
+		$window.location.href= "/pantry_app/inventory";
 	}
 
 

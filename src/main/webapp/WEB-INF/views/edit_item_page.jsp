@@ -18,16 +18,16 @@
 </head>
 <body ng-app="PantryApp">
 	<div id="homepage-navbar" class="navbar">
-		<h3 class="center">Add an item to ${containerName}!</h3>
 		<span class="locations banner"><a href="/pantry_app/inventory">Full
 				Inventory</a><a href="/pantry_app/containers">Containers</a></span>
 	</div>
 	<div ng-controller="EditItemController as editItem">
-		<button type="button" ng-click="editItem.deleteItem($event)">Just
+		<h3 class="center">Editing {{editItem.initialItem.naiiveItemName}}!</h3>
+		<button class="delete button" type="button" ng-click="editItem.deleteItem($event)">Just
 			Delete It</button>
 		<form id="edit-item-form"
 		ng-submit="editItem.submitItem($event)" 
-		ng-hide="editItem.successMessage || editItem.errorMessage">
+		ng-hide="editItem.putIsSent">
 			<div id="upc-div">
 				<input id="upc-input-input" class="input large"
 					ng-model="editItem.workingItem.upc" ng-disabled="editItem.upcIsRequested"
@@ -39,7 +39,7 @@
 				<span ng-show="editItem.upcLookupError">{{editItem.upcLookupError}}</span>
 			</div>
 			<div>
-				<div ng-show="editItem.upcIsRequested">
+				<div class="lookup-spinner" ng-show="editItem.upcIsRequested">
 					<h3>Looking for info on that UPC</h3>
 					<div id="upc-lookup-spinner" class="purple-loading-spinner"></div>
 				</div>
@@ -73,13 +73,13 @@
 					<button type="button" ng-click="editItem.transferAll()">I want to use all
 						the sourced data.</button>
 				</div>
-				<div ng-show="editItem.upcIsRequested">
+				<div>
 					<input type="submit" name="submit"
-						value="Add this item to the container.">
+						value="Update the Container.">
 				</div>
 			</div>
 		</form>
-		<div ng-show="editItem.postIsSent">
+		<div ng-show="editItem.putIsSent">
 			<div ng-hide="editItem.successMessage || editItem.errorMessage">
 				<h3>Working on that!</h3>
 				<div id="posting-spinner" class="purple-loading-spinner"></div>
@@ -91,8 +91,7 @@
 			</div>
 			<div ng-show="editItem.successMessage">
 				<span class="api-message success">{{editItem.successMessage}}</span>
-				<button ng-click="editItem.resetForm()">I'd like to edit
-					another item to this container.</button>
+				<button ng-click="editItem.resetForm()">I'd like to restore or edit the item again.</button>
 			</div>
 			<button ng-click="editItem.goToHome()">Back to the inventory.</button>
 		</div>

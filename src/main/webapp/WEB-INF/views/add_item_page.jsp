@@ -37,7 +37,7 @@
 				<span ng-show="addItem.upcLookupError">{{addItem.upcLookupError}}</span>
 			</div>
 			<div ng-show="addItem.upcIsRequested">
-				<div ng-hide="addItem.upcQueryResolved">
+				<div class="lookup-spinner" ng-hide="addItem.upcQueryResolved">
 					<h3>Looking for info on that UPC</h3>
 					<div id="upc-lookup-spinner" class="purple-loading-spinner"></div>
 				</div>

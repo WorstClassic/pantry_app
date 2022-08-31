@@ -1,9 +1,9 @@
 'use strict';
 
-angular.module("PantryApp").controller("AddItemController", ["$scope", "$location", "ContainerService", "InventoryService", AddItemController
+angular.module("PantryApp").controller("AddItemController", ["$scope", "$window", "$location", "ContainerService", "InventoryService", AddItemController
 ]);
 
-function AddItemController($scope, $location, ContainerService, InventoryService) {
+function AddItemController($scope, $window, $location, ContainerService, InventoryService) {
 
 	const upcValidateRegex = /^\d{12}$/;
 
@@ -159,7 +159,7 @@ function AddItemController($scope, $location, ContainerService, InventoryService
 		vm.postIsSent = false;
 	};
 	function navigateToContainersPage() {
-		$location.path("/containers");
+		$window.location.href= "/pantry_app/containers";
 	}
 
 

@@ -31,7 +31,7 @@
 				class="inventory box display ng-hook">
 				<div ng-attr-id="{{'item-id-'+item.id}}"
 					ng-attr-class="{{item.warning?'item card error':'item card'}}">
-					<a ng-attr-id="{{'item-id-'+item.id+'-edit-button'}}" ng-attr-href="{{'./inventory/'+item.id}}">Click here to edit or delete this entry.</a>
+					<a ng-attr-id="{{'item-id-'+item.id+'-edit-button'}}" ng-attr-href="{{'/pantry_app/inventory/'+item.id}}">Click here to edit or delete this entry.</a>
 					<div>upc: {{item.upc}}</div>
 					<div>name: {{item.naiiveItemName}} - {{item.unit_amount}}
 						{{item.unit}}</div>

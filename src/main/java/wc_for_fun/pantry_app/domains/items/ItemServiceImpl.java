@@ -122,7 +122,7 @@ public class ItemServiceImpl implements ItemService {
 	public ItemAndSourceDTO getItemByUPC(String incomingUPC) {
 		Item tentativeItem = null;
 		List<Item> retrievedItems = itemRepo.findAllByUpc(incomingUPC);
-		if (retrievedItems.size() == 1)
+		if (retrievedItems.size() > 0) //altered from == 1 because current model forbids uniqueness. TODO fix that.
 			tentativeItem = retrievedItems.get(0);
 		if (tentativeItem != null) {
 			ItemAndSourceDTO readyToReturn = new ItemAndSourceDTO();
