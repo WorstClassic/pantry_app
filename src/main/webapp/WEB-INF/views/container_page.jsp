@@ -6,7 +6,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Inventory</title>
-
+<link href="/pantry_app/resources/css/style.css" rel="stylesheet">
+<link href="/pantry_app/resources/css/container.css" rel="stylesheet">
 <!-- AngularJS -->
 <script
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.js"></script>
@@ -38,13 +39,28 @@
 			<div>${error}</div>
 		</div>
 		<div ng-repeat="container in ctrl.containers"
-			class="container box display ng-hook" id="container-display">
-			<h2>{{container.name}}</h2>
+			class="container box display ng-hook" ng-attr-id={{'container-display-'+container.id}}>
+			<div>
+				<h2>{{container.name}}</h2>
+				<button ng-hide="container.editName" ng-click="container.editName=true">Change Name or
+					Delete</button>
+				<div ng-show="container.editName">
+					<input type="text" ng-model="container.newName"
+						placeholder="What will the new name be?">
+					<button ng-click="ctrl.updateContainer($event, container)">{{container.newName ? "Attempt
+						to update the name" : "Cancel"}}</button>
+					<div ng-show="container.updateError">SOMETHING WENT WRONG</div>
+					<button class="delete"
+						ng-click="ctrl.deleteContainer($event, container)">Delete
+						it</button>
+				</div>
+			</div>
 			<a ng-href="./containers/{{container.id}}/new-item"> Add an Item
 				to This Container </a>
 			<div ng-attr-id="{{'container-id-'+ container.id}}"
-				class="container card entry">
-				<div ng-repeat="item in container.contents">
+				class="container deck entry">
+				<div class="container card entry"
+					ng-repeat="item in container.contents">
 					<div>upc: {{item.upc}}</div>
 					<div>name: {{item.naiiveItemName}} - {{item.unit_amount}}
 						{{item.unit}}</div>

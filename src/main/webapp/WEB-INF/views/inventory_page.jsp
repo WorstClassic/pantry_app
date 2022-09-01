@@ -6,6 +6,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Inventory</title>
+<link href="/pantry_app/resources/css/style.css" rel="stylesheet">
 <link href="/pantry_app/resources/css/inventory.css" rel="stylesheet">
 <!-- AngularJS -->
 <script
@@ -30,6 +31,7 @@
 				class="inventory box display ng-hook">
 				<div ng-attr-id="{{'item-id-'+item.id}}"
 					ng-attr-class="{{item.warning?'item card error':'item card'}}">
+					<a ng-attr-id="{{'item-id-'+item.id+'-edit-button'}}" ng-attr-href="{{'/pantry_app/inventory/'+item.id}}">Click here to edit or delete this entry.</a>
 					<div>upc: {{item.upc}}</div>
 					<div>name: {{item.naiiveItemName}} - {{item.unit_amount}}
 						{{item.unit}}</div>
@@ -38,11 +40,10 @@
 					<div>Expires: {{item.expiryDateString}}</div>
 					<div>Got: {{item.obtainDateString}}</div>
 					<div class="description">
-					<pre>
 						Description:
+						<br>
 						<div>{{item.naiiveItemDescription}}</div>
 					</div>
-					</pre>
 				</div>
 			</div>
 		</div>

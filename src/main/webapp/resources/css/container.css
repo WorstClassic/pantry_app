@@ -1,0 +1,21 @@
+.box {
+  display: flex;
+  border: 1px solid darkblue;
+  flex-flow: column;
+  padding: 0rem .5rem;
+  margin: .5rem;
+}
+
+.card {
+  display: flex;
+  flex-flow: column;
+  margin: 1rem;
+  border: solid black 1px;
+  padding: .5rem;
+  width: 30%;
+}
+
+.deck {
+  display: flex;
+  flex-flow: row wrap;
+}

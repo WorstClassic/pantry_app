@@ -6,6 +6,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Home</title>
+<link href="/pantry_app/resources/css/style.css" rel="stylesheet">
 </head>
 <body>
 	<div id="homepage-navbar" class="navbar">

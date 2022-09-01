@@ -1,3 +1,10 @@
+.lookup-spinner{
+	z-index: 5;
+float: left;
+position: absolute;
+margin-left: 33%;
+}
+
 .purple-loading-spinner {
 	background-image: linear-gradient(to bottom, blue, purple, red);
 	border: 1rem dashed black;

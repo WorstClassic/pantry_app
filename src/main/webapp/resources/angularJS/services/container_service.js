@@ -12,6 +12,8 @@ function ContainerServiceFactory($http){
 	const factory = {
 		getAllContainersAndContents: getAllContainersAndContents,
 		postContainer: postContainer,
+		putContainer: putContainer,
+		deleteContainer: deleteContainer,
 		postItemToContainer: postItemToContainer
 	};
 	
@@ -23,6 +25,12 @@ function ContainerServiceFactory($http){
 	
 	function postContainer(newContainer) {
 		return $http.post(`${API_ROOT}${CONTAINER}`, newContainer);
+	}
+	function putContainer(updatedContainer) {
+		return $http.put(`${API_ROOT}${CONTAINER}/${updatedContainer.id}`, updatedContainer);
+	}
+	function deleteContainer(deletedContainer) {
+		return $http.delete(`${API_ROOT}${CONTAINER}/${deletedContainer.id}`);
 	}
 	
 	function postItemToContainer(newItem, containerId){

@@ -1,31 +1,36 @@
 'use strict';
 
-angular.module("PantryApp").controller("AddItemController", ["$scope", "$window", "$location", "ContainerService", "InventoryService", AddItemController
+angular.module("PantryApp").controller("EditItemController", ["$scope","$window", "$location", "ContainerService", "InventoryService", EditItemController
 ]);
+//EditItemController.$inject = ['$window'];
 
-function AddItemController($scope, $window, $location, ContainerService, InventoryService) {
+function EditItemController($scope, $window, $location, ContainerService, InventoryService) {
 
 	const upcValidateRegex = /^\d{12}$/;
 
 	const vm = this;
+
+
 	vm.workingItem = {};
+	vm.initialItem = {};
 	vm.upcQueryResponse = {};
 	vm.upc = "";
 	vm.errorMitigation = false;
 	vm.successMessage = false;
 	vm.upcIsRequested = false;
 	vm.showRemoteInfo = false;
-	vm.postIsSent = false;
+	vm.putIsSent = false;
 	vm.containerId = findPathId();
 	vm.upcLookupError = false;
 	vm.upcQueryResolved = false;
 	vm.upcQuery = lookUpUpc;
 	vm.transferFromLoad = transferToWorkingItem;
 	vm.transferAll = transferAll;
-	vm.submitItem = submitNewItem;
+	vm.submitItem = submitUpdates;
 	vm.resetForm = resetForm;
 	vm.reopenForm = allowEditingUpc;
-	vm.goToHome = navigateToContainersPage;
+	vm.goToHome = navigateToInventoryPage;
+	vm.deleteItem = deleteEntry;
 
 	vm.displayOrderer = [
 		{
@@ -50,18 +55,31 @@ function AddItemController($scope, $window, $location, ContainerService, Invento
 		{ name: "unit" }
 	];
 
+	getEditingItem();
+
+	function getEditingItem() {
+		InventoryService.getItemById(findPathId())
+			.then(function spreadInitialData(res) {
+				vm.workingItem = { ...res.data };
+				vm.workingItem.obtainDate = InventoryService.generateDateObject(vm.workingItem.obtainDate);
+				vm.workingItem.expiryDate = InventoryService.generateDateObject(vm.workingItem.expiryDate);
+				vm.initialItem = { ...vm.workingItem };
+			},
+				function initialLoadFails(err) { console.log(err.message) });
+	}
+
 	function findPathId() {
 		//const pathRef = $location.path(); //For some reason, path() returns "" in my impl.
 		const pathRef = $location.absUrl();
 		const splitOnSlash = pathRef.split('/');
-		const index = splitOnSlash.length - 2;
+		const index = splitOnSlash.length - 1;
 		return splitOnSlash[index];//Probably should reference this from someplace else.
 	};
 
 	function lookUpUpc(event) {
 		event.preventDefault();
 		vm.upcLookupError = false;
-		const rawUpc = vm.upc.substring(0);
+		const rawUpc = vm.workingItem.upc.substring(0);
 		const queryUpc = rawUpc.replace(/-|\s/g, "");
 		if (!upcValidateRegex.test(queryUpc)) {
 			vm.upcLookupError = "Could not read that as a UPC-A. A UPC-A is a 12 digit code.";
@@ -79,12 +97,12 @@ function AddItemController($scope, $window, $location, ContainerService, Invento
 				}).finally(upcCallComplete);
 	};
 
-	function submitNewItem(event) {
+	function submitUpdates(event) {
 		event.preventDefault();
-		vm.postIsSent = true;
-		const postBody = { upc: vm.upc };
-		vm.displayOrderer.forEach(entry => formatArguments(entry, postBody));
-		postEntry(postBody).then(postSuccess, postFailMitigate).finally(postCleanup);
+		vm.putIsSent = true;
+		const putBody = { ...vm.workingItem };
+		vm.displayOrderer.forEach(entry => formatArguments(entry, putBody));
+		putEntry(putBody).then(putSuccess, putFailMitigate).finally(putCleanup);
 	}
 
 	function transferToWorkingItem(variableName) {
@@ -106,7 +124,8 @@ function AddItemController($scope, $window, $location, ContainerService, Invento
 
 	function upcCallComplete() {
 		vm.upcQueryResolved = true;
-		vm.showRemoteInfo = (vm.upcQueryResponse.source != "LOCAL_CACHE");
+		vm.upcIsRequested = false;
+		vm.showRemoteInfo = true; //(vm.upcQueryResponse.source != "LOCAL_CACHE");
 		if (!vm.showRemoteInfo) { //TODO Lotta ! that could be omitted by renaming the boolean.
 			vm.displayOrderer.forEach(entry => {
 				if (entry.copy === undefined) {
@@ -115,29 +134,37 @@ function AddItemController($scope, $window, $location, ContainerService, Invento
 			});
 		}
 	};
-	function formatArguments(entry, postBody) {
-		postBody[entry.name] = vm.workingItem[entry.name];
+	function formatArguments(entry, putBody) {
+		putBody[entry.name] = vm.workingItem[entry.name];
 		if (entry.type === "date") {
-			console.log(postBody[entry.name])
+			console.log(putBody[entry.name])
 			//some processing on vm.working
 		}
 	}
 
-	function postSuccess(res) {
+	function putSuccess(res) {
 		const data = res.data;
 		const expiryDateObj = InventoryService.generateDateObject(data.expiryDate);
 		const expiryString = expiryDateObj.toDateString();
-		vm.successMessage = `Your ${data.naiiveItemName} has been added!  \n   Remember that it will expire on: ${expiryString}.`;
+		vm.successMessage = `Your ${data.naiiveItemName} has been edited!  \n   Remember that it will expire on: ${expiryString}.`;
 	}
 
-	function postFailMitigate(err) {
+	function putFailMitigate(err) {
 		vm.errorMessage = err.message;
 	}
-	function postCleanup() { }
+	function putCleanup() { }
 
 
-	function postEntry(postBody) {
-		return ContainerService.postItemToContainer(postBody, vm.containerId)
+	function putEntry(putBody) {
+		return InventoryService.putItem(putBody);
+	}
+
+	function deleteEntry(event) {
+		event.preventDefault();
+		InventoryService.deleteItem(vm.initialItem)
+			.then(function deleteSuccess(res) {
+				navigateToInventoryPage();
+			}, function deleteFail(err) { });
 	}
 
 	function stopEditingUpc() {
@@ -148,7 +175,7 @@ function AddItemController($scope, $window, $location, ContainerService, Invento
 		//We should wipe out all data. $Pristine?
 	};
 	function resetForm() {
-		vm.workingItem = {};
+		vm.workingItem = { ...vm.initialItem };
 		vm.upcQueryResponse = {};
 		vm.upc = "";
 		vm.errorMitigation = false;
@@ -156,10 +183,10 @@ function AddItemController($scope, $window, $location, ContainerService, Invento
 		vm.upcQueryResolved = false;
 		vm.upcIsRequested = false;
 		vm.showRemoteInfo = false;
-		vm.postIsSent = false;
+		vm.putIsSent = false;
 	};
-	function navigateToContainersPage() {
-		$window.location.href= "/pantry_app/containers";
+	function navigateToInventoryPage() {
+		$window.location.href= "/pantry_app/inventory";
 	}
 
 
