@@ -4,9 +4,16 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.ListJoin;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.EntityType;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -45,7 +52,7 @@ public class ContainerDAOImpl implements ContainerDAO {
 		Session addSession = sessionFactory.openSession();
 
 		try {
-			tx=addSession.beginTransaction();
+			tx = addSession.beginTransaction();
 			Serializable createdContainer = addSession.save(newContainer);
 			if (newContainer.getId() == null) {
 				System.out.println("where did the thing go?");
@@ -74,7 +81,7 @@ public class ContainerDAOImpl implements ContainerDAO {
 		} catch (Exception e) {
 			System.out.println("O boy what happened?");
 		}
-updateSession.close();
+		updateSession.close();
 		return Optional.of(updatedContainer);
 	}
 
@@ -133,12 +140,26 @@ updateSession.close();
 	@Override
 	@Transactional(readOnly = true)
 	public List<Container> getContainersByName(String name) {
-		Session getIdSession = sessionFactory.openSession();
-		TypedQuery<Container> insertSafeId = getIdSession
-				.createQuery("from Container c LEFT JOIN FETCH c.contents WHERE name like :name");
-		insertSafeId.setParameter("name", name);
+		Session getNameSession = sessionFactory.openSession();
+		EntityManagerFactory emf = getNameSession.getEntityManagerFactory();
+		CriteriaBuilder cb = emf.getCriteriaBuilder();
+		CriteriaQuery<Container> cq = cb.createQuery(Container.class);
+		Root<Container> containerRoot = cq.from(Container.class);
+		EntityType<Container> Container_ = containerRoot.getModel();
 
-		return insertSafeId.getResultList();
+		Predicate likeName = cb.like(cb.lower(containerRoot.get("name")), name.toLowerCase());
+
+		cq.select(containerRoot).where(likeName);
+
+		List<Container> debugHook = getNameSession.createQuery(cq).getResultList();
+
+		return debugHook;
+//		TypedQuery<Container> insertSafeId = getIdSession
+//				.createQuery("from Container c LEFT JOIN FETCH c.contents WHERE name like :name");
+//		insertSafeId.setParameter("name", name);
+//
+//		return insertSafeId.getResultList();
+
 	}
 
 }

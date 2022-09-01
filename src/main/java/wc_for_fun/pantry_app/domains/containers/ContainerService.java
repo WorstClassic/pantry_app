@@ -17,7 +17,7 @@ public interface ContainerService {
 	public Container updateTargetEntityWithPassedModel(Long targetId, Container incomingContainer);
 	public Container deleteContainerById(Long targetId);
 	
-	public List<Container> getAll();
+	public List<Container> getAll(String name);
 	
 	public Container addContainer(Container incomingContainer);
 

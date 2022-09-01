@@ -48,8 +48,10 @@ public class ContainerServiceImpl implements ContainerService {
 	}
 
 	@Override
-	public List<Container> getAll() {
-		return containerRepo.getContainers();
+	public List<Container> getAll(String name) {
+		if (name == null || name.isEmpty())
+			return containerRepo.getContainers();
+		return containerRepo.getContainersByName(name);
 	}
 
 //	@Override
@@ -95,7 +97,7 @@ public class ContainerServiceImpl implements ContainerService {
 		}
 		try {
 			existingContainer.updateProperties(incomingContainer);
-		return containerRepo.updateContainer(existingContainer).get();
+			return containerRepo.updateContainer(existingContainer).get();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}

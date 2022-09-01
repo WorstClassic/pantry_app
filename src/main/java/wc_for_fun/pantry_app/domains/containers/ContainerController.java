@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import wc_for_fun.pantry_app.domains.items.Item;
@@ -29,8 +30,8 @@ public class ContainerController {
 	ItemService itemService;
 
 	@GetMapping()
-	public ResponseEntity<List<Container>> getAllUserContainers() {
-		return new ResponseEntity<>(containerService.getAll(), HttpStatus.OK);
+	public ResponseEntity<List<Container>> getAllUserContainers(@RequestParam(required=false) String name) {
+		return new ResponseEntity<>(containerService.getAll(name), HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/{id}")
