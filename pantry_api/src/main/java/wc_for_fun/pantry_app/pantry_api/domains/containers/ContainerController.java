@@ -22,7 +22,8 @@ import wc_for_fun.pantry_app.pantry_api.domains.items.Item;
 import wc_for_fun.pantry_app.pantry_api.domains.items.ItemService;
 
 @RestController
-@CrossOrigin(origins={"http://localhost:3000","https://localhost:3000"})
+@CrossOrigin(origins={"http://localhost:3000","https://localhost:3000",
+		"http://localhost:8080, https://localhost:8080"})
 @RequestMapping(value = "/containers")
 public class ContainerController {
 

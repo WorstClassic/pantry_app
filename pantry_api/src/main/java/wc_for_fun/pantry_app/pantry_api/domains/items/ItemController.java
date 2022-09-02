@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import wc_for_fun.pantry_app.pantry_api.constants.SourceConstantsInventory;
 
 @RestController
-@CrossOrigin(origins={"http://localhost:3000","https://localhost:3000"})
+@CrossOrigin(origins={"http://localhost:3000","https://localhost:3000",
+		"http://localhost:8080, https://localhost:8080"})
 @RequestMapping(value = "/items")
 public class ItemController {
 
