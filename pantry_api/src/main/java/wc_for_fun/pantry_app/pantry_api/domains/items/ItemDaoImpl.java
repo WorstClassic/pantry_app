@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
-@EnableTransactionManagement
-@Component
+//@EnableTransactionManagement
+//@Component
 public class ItemDaoImpl implements ItemDao {
 
 	@Autowired

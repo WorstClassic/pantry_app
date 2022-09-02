@@ -22,8 +22,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import wc_for_fun.pantry_app.constants.URIConstantsInventory;
+
 @Controller
 public class HomeController {
+	private final String CONTAINERS_URI=URIConstantsInventory.API_ROOT+"/containers/";
 
 	@RequestMapping(value = "/")
 	public ModelAndView test(HttpServletResponse response) throws IOException {
@@ -71,7 +74,7 @@ public class HomeController {
 
 	private String retrieveContainerName(Long id) {
 
-		Request request = new Request.Builder().url("http://localhost:8080/containers/" + id.toString()).build();
+		Request request = new Request.Builder().url(CONTAINERS_URI + id.toString()).build();
 
 		OkHttpClient client = new OkHttpClient.Builder().build();
 
@@ -110,7 +113,7 @@ public class HomeController {
 						+ "    \"contents\":[]\r\n" + "}";
 				okhttp3.RequestBody newContainerAsJSON = okhttp3.RequestBody.create(containerString,
 						MediaType.get("application/json"));
-				Request request = new Request.Builder().url("http://localhost:8080/containers").post(newContainerAsJSON)
+				Request request = new Request.Builder().url(CONTAINERS_URI).post(newContainerAsJSON)
 						.build();
 
 				OkHttpClient client = new OkHttpClient.Builder().build();

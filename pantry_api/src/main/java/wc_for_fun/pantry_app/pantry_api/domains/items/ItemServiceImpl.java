@@ -20,6 +20,7 @@ import okhttp3.Response;
 import wc_for_fun.pantry_app.pantry_api.constants.SourceConstantsInventory;
 import wc_for_fun.pantry_app.pantry_api.constants.URIConstantsInventory;
 import wc_for_fun.pantry_app.pantry_api.domains.containers.Container;
+import wc_for_fun.pantry_app.pantry_api.domains.containers.ContainerRepo;
 import wc_for_fun.pantry_app.pantry_api.domains.containers.ContainerService;
 import wc_for_fun.pantry_app.pantry_api.mockData.MockData;
 
@@ -34,6 +35,9 @@ public class ItemServiceImpl implements ItemService {
 //	
 	@Autowired
 	ItemRepo itemRepo;
+	
+	@Autowired
+	ContainerRepo containerRepo;
 
 	@Override
 	public Item addItemToValidContainer(Item incomingItem, Container incomingContainer) {
@@ -169,7 +173,8 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public List<Item> getItemsByUPC(String incomingUPC) {
-		return itemRepo.findByUpcString(incomingUPC);
+		UPCWrapper pojodUpcString = new UPCWrapper(incomingUPC);
+		return itemRepo.findAllByUpc(pojodUpcString);
 	}
 
 	private Item convertResponseToItem(Response incomingResponse) {
@@ -225,6 +230,10 @@ public class ItemServiceImpl implements ItemService {
 	public Item deleteItemById(Long targetId) {
 		Item existingItem = getSolo(targetId);
 		if(existingItem==null) return null;
+		for(Container managedContainer : existingItem.getContainers()) {
+			managedContainer.getContents().remove(existingItem);
+			containerRepo.save(managedContainer);
+		}
 		itemRepo.deleteById(targetId);
 		return existingItem;
 	}

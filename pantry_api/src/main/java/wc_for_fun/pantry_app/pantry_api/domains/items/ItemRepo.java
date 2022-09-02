@@ -8,10 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ItemRepo extends JpaRepository<Item, Long>, ItemDao {
+public interface ItemRepo extends JpaRepository<Item, Long>{
 	public List<Item> findAll();
 	public Optional<Item> findById(Long idOfItem);
 	
 	public List<Item> findAllByUpc(UPCWrapper upc);
-	//Now handled in ItemDAO
 }

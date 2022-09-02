@@ -49,6 +49,13 @@ function InventoryServiceFactory($http) {
 					return new Date(...dateJSONArray);
 				}
 			}
+			if(typeof dateJSONArray === "string"){
+				try{
+					return new Date(dateJSONArray);
+				} catch (err) {
+					console.log("Looks like date-ifying the string failed");
+				}
+			}
 		}
 	}
 

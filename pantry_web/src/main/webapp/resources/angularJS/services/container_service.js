@@ -34,6 +34,6 @@ function ContainerServiceFactory($http){
 	}
 	
 	function postItemToContainer(newItem, containerId){
-		return $http.post(`${API_ROOT}${CONTAINER}/${containerId}/${ITEM}`, newItem);
+		return $http.post(`${API_ROOT}${CONTAINER}/${containerId}${ITEM}`, newItem);
 	}
 }
