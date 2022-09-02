@@ -24,22 +24,14 @@ function InventoryController($scope, InventoryService) {
 			//but in the battle between YAGNI and DRY; YAGNI won out this time.
 			ItemElement.warning = "";
 			if (ItemElement.obtainDate) {
-				if (Array.isArray(ItemElement.obtainDate)) {
-					if (ItemElement.obtainDate.length === 3) {
-						ItemElement.obtainDateObj = InventoryService.generateDateObject(ItemElement.obtainDate);
-						ItemElement.obtainDateString = ItemElement.obtainDateObj.toDateString();
-					}
-				}
+				ItemElement.obtainDate = InventoryService.generateDateObject(ItemElement.obtainDate);
+				ItemElement.obtainDateString = ItemElement.obtainDate.toLocaleDateString();
 			}
 			if (ItemElement.expiryDate) {
-				if (Array.isArray(ItemElement.expiryDate)) {
-					if (ItemElement.expiryDate.length === 3) { //I did a belt-and-suspenders here.
-						ItemElement.expiryDateObj = InventoryService.generateDateObject(ItemElement.expiryDate);
-						ItemElement.expiryDateString = ItemElement.expiryDateObj.toDateString();
-						if (ItemElement.expiryDateObj < Date.now()) {
-							ItemElement.warning = ItemElement.warning.concat("This item may be expired!");
-						}
-					}
+				ItemElement.expiryDate = InventoryService.generateDateObject(ItemElement.expiryDate);
+				ItemElement.expiryDateString = ItemElement.expiryDate.toLocaleDateString();
+				if (ItemElement.expiryDate < Date.now()) {
+					ItemElement.warning = ItemElement.warning.concat("This item may be expired!");
 				}
 			}
 			if (ItemElement.containers.length > 1) {
@@ -52,7 +44,7 @@ function InventoryController($scope, InventoryService) {
 		vm.dataArrays.defaultLoad = [...rawReturn];
 		vm.dataArrays.sortByExpiry = [...rawReturn];
 		vm.dataArrays.sortByExpiry.sort((a, b) => {
-			return a.expiryDateObj - b.expiryDateObj;
+			return a.expiryDate - b.expiryDate;
 		});
 		vm.displayData = vm.dataArrays.defaultLoad;
 	}

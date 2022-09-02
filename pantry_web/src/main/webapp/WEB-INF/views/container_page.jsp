@@ -65,10 +65,10 @@
 					<div>name: {{item.naiiveItemName}} - {{item.unit_amount}}
 						{{item.unit}}</div>
 					<div>Got:
-						{{item.obtainDate[0]}}Year-{{item.obtainDate[1]}}Month-{{item.obtainDate[2]}}Day
+						{{item.obtainDateString}}
 					</div>
 					<div>Expires:
-						{{item.expiryDate[0]}}Year-{{item.expiryDate[1]}}Month-{{item.expiryDate[2]}}Day
+						{{item.expiryDateString}}
 					</div>
 					<div>
 						Description:

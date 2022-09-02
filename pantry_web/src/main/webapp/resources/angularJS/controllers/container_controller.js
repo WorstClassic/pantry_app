@@ -19,6 +19,18 @@ function ContainerController($scope, ContainerService) {
 		ContainerService.getAllContainersAndContents()
 			.then(function spreadData(res) {
 				vm.containers = res.data;
+				vm.containers.forEach(containerEntry => {
+					containerEntry.contents.forEach(itemEntry => {
+						if (itemEntry.obtainDate) {
+							itemEntry.obtainDate = generateDateObject(itemEntry.obtainDate);
+							itemEntry.obtainDateString = itemEntry.obtainDate.toLocaleDateString();
+						}
+						if (itemEntry.expiryDate) {
+							itemEntry.expiryDate = generateDateObject(itemEntry.expiryDate);
+							itemEntry.expiryDateString = itemEntry.expiryDate.toLocaleDateString();
+						}
+					});
+				});
 				$scope.containers = res.data;
 			},
 				function mitigateError(err) {
@@ -63,6 +75,24 @@ function ContainerController($scope, ContainerService) {
 					console.log(err);
 					console.log(err.message);
 				});
+	}
+	
+	function generateDateObject(dateJSONArray) {
+		if (dateJSONArray) {
+			if (typeof dateJSONArray === "object" && Array.isArray(dateJSONArray)) {
+				if (dateJSONArray.length === 3) {
+					dateJSONArray[1]--;
+					return new Date(...dateJSONArray);
+				}
+			}
+			if (typeof dateJSONArray === "string") {
+				try {
+					return new Date(dateJSONArray);
+				} catch (err) {
+					console.log("Looks like date-ifying the string failed");
+				}
+			}
+		}
 	}
 
 };
