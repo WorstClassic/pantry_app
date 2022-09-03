@@ -1,0 +1,29 @@
+#list-container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-evenly;
+	height: 80vh;
+	width: 80%;
+}
+
+.card {
+	border: solid blue;
+	border-radius: 5%;
+	font-size: larger;
+	display: flex;
+	flex-flow: column; 
+	padding: 1rem;
+	margin: 1rem;
+	white-space: pre-line;
+	width: max-content;
+	height: max-content;
+}
+
+.description {
+	border-top: dashed blue 1px;
+	margin-top: .5rem;
+}
+
+.error {
+	box-shadow: 1rem 1rem red inset;
+}
